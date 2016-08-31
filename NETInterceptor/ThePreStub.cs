@@ -72,7 +72,7 @@ namespace NETInterceptor
             {
                 get
                 {
-                    var ptr = (byte *)ThePreStubPtr.ToPointer() + 0xC;
+                    var ptr = ThePreStubPtr.ToBytePtr() + 0xC;
                     var offset = *(int*)(ptr + 1);
                     return new IntPtr(ptr + offset + 5);
                 }
@@ -150,7 +150,7 @@ namespace NETInterceptor
                         a5:   c3                      ret
                         */
                         #endregion
-                        var ptr = (byte *)ThePreStubPtr.ToPointer() + 0xC;
+                        var ptr = ThePreStubPtr.ToBytePtr() + 0xC;
                         var offset = *(int*)(ptr + 1);
                         return new IntPtr(ptr + offset + 5);
                     }

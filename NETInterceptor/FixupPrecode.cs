@@ -12,7 +12,7 @@ namespace NETInterceptor
     *    6:   04                      db 0x04 ; MethodDescChunkIndex
     *    7:   01                      db 0x01 ; PrecodeChunkIndex
     */
-    public abstract unsafe class FixupPrecode : Precode
+    public unsafe abstract class FixupPrecode : Precode
     {
         protected static Lazy<IntPtr> _precodeFixupThunk = new Lazy<IntPtr>(GetPrecodeFixupThunk);
 
@@ -42,7 +42,7 @@ namespace NETInterceptor
         {
             get
             {
-                var ptr = (byte *)_methodPtr.ToPointer();
+                var ptr = _methodPtr.ToBytePtr();
                 var operand = new IntPtr(*(int*)(ptr + 1));
                 return operand != PrecodeFixupThunk &&
                     (*(ptr + 5) == 0xCC || *(ptr + 5) == 0x5F);
@@ -55,13 +55,13 @@ namespace NETInterceptor
             {
                 if (IsJitted) {
                     // return CompiledMethod addr
-                    var ptr = (byte *)_methodPtr.ToPointer();
+                    var ptr = _methodPtr.ToBytePtr();
                     var offset = *(int *)(ptr + 1);
                     return new IntPtr(ptr + offset + 5);
                 } else {
                     // return ThePreStub addr via PrecodeFixupThunk
                     // e8 xx xx xx xx ; call PrecodeFixupThunk
-                    return new IntPtr(GetThePreStubPtr((byte*)PrecodeFixupThunk.ToPointer()));
+                    return new IntPtr(GetThePreStubPtr(PrecodeFixupThunk.ToBytePtr()));
                 }
             }
         }
@@ -70,8 +70,7 @@ namespace NETInterceptor
         {
             get
             {
-                var p = (byte*)_methodPtr.ToPointer();
-                return *(p + 7);
+                return *(_methodPtr.ToBytePtr() + 7);
             }
         }
 
@@ -79,8 +78,7 @@ namespace NETInterceptor
         {
             get
             {
-                var p = (byte*)_methodPtr.ToPointer();
-                return *(p + 6);
+                return *(_methodPtr.ToBytePtr() + 6);
             }
         }
 
@@ -88,12 +86,12 @@ namespace NETInterceptor
 
         private byte* GetMethodDescChunkBasePtr()
         {
-            return (byte*)_methodPtr.ToPointer() + 8 + PrecodeChunkIndex * 8;
+            return _methodPtr.ToBytePtr() + 8 + PrecodeChunkIndex * 8;
         }
 
         public static bool IsFixupPrecode(IntPtr methodPtr)
         {
-            var ptr = (byte *)methodPtr.ToPointer();
+            var ptr = methodPtr.ToBytePtr();
             var b1 = *ptr;
             var b2 = *(ptr + 5);
 
@@ -107,9 +105,9 @@ namespace NETInterceptor
         {
             var ptr = DetectPrecode.GetPrecodePtr();
 
-            Debug.Assert(FixupPrecode.HasPrecode(ptr));
+            Debug.Assert(IsFixupPrecode(ptr));
 
-            var fixupThunkPtr = (byte*)ptr.ToPointer();
+            var fixupThunkPtr = ptr.ToBytePtr();
             var fixupThunkOffset = *(int*)(fixupThunkPtr + 1);
 
             return new IntPtr(fixupThunkPtr + fixupThunkOffset + 5);

@@ -39,6 +39,9 @@ namespace NETInterceptor
 
         private static void CheckSignatures(MethodBase target, MethodBase substitute)
         {
+            if (target is ConstructorInfo)
+                throw new NotSupportedException();
+
             if (target.GetType() != substitute.GetType())
                 throw new ArgumentException("Target and its substitute should have same types.");
 

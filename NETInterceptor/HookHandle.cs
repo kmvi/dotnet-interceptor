@@ -30,7 +30,7 @@ namespace NETInterceptor
             if (args == null)
                 args = new object[0];
 
-            // TODO: 
+            // TODO: use delegate, remove lock
             object result;
             lock (_target) {
                 _inject.Restore();

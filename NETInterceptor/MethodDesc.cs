@@ -5,7 +5,7 @@ using System.Text;
 
 namespace NETInterceptor
 {
-    public unsafe class MethodDesc
+    /*public unsafe class MethodDesc
     {
         private readonly byte* _ptr;
 
@@ -181,5 +181,5 @@ namespace NETInterceptor
         {
             throw new NotImplementedException();
         }
-    }
+    }*/
 }

@@ -52,7 +52,7 @@ namespace NETInterceptor
             {
                 get
                 {
-                    var ptr = (byte*)JmpToTargetPtr.ToPointer();
+                    var ptr = JmpToTargetPtr.ToBytePtr();
                     var offset = *(int *)(ptr + 1);
                     return new IntPtr(ptr + offset + 5);
                 }
@@ -62,7 +62,7 @@ namespace NETInterceptor
             {
                 get
                 {
-                    var ptr = (byte*)_methodPtr.ToPointer();
+                    var ptr = _methodPtr.ToBytePtr();
                     return new IntPtr(*(int*)(ptr + 1));
                 }
             }
@@ -95,7 +95,7 @@ namespace NETInterceptor
             {
                 get
                 {
-                    var ptr = (byte*)JmpToTargetPtr.ToPointer();
+                    var ptr = JmpToTargetPtr.ToBytePtr();
                     var offset = *(int*)(ptr + 2);
                     return new IntPtr(ptr + offset + 6);
                 }
@@ -105,7 +105,7 @@ namespace NETInterceptor
             {
                 get
                 {
-                    var ptr = (byte*)_methodPtr.ToPointer();
+                    var ptr = _methodPtr.ToBytePtr();
                     return new IntPtr(*(long*)(ptr + 2));
                 }
             }

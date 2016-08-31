@@ -76,7 +76,7 @@ namespace NETInterceptor
                 var addr = Utils.FollowRelJmp(precode.JmpToTargetPtr);
                 if (addr == ThePreStub.Instance.ThePreStubPtr) {
                     return IntPtr.Zero;
-                } else if (FixupPrecode.HasPrecode(addr)) {
+                } else if (FixupPrecode.IsFixupPrecode(addr)) {
                     return GoThroughFixupPrecode(FixupPrecode.Create(addr));
                 }
                 

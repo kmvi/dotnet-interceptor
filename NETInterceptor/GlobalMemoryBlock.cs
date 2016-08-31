@@ -52,9 +52,7 @@ namespace NETInterceptor
         public void Dispose()
         {
             if (!_disposed) {
-                if (_address != IntPtr.Zero) {
-                    Marshal.FreeHGlobal(_address);
-                }
+                Marshal.FreeHGlobal(_address);
                 _disposed = true;
             }
         }
