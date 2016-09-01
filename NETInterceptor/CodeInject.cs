@@ -17,11 +17,11 @@ namespace NETInterceptor
         protected bool _disposed;
         protected IntPtr _relocated;
 
-        protected CodeInject(IntPtr pCompiledTarget, IntPtr pCompiledSubst, IntPtr pReloc)
+        protected CodeInject(IntPtr pCompiledTarget, IntPtr pCompiledSubst, IntPtr pRelocated)
         {
             _target = pCompiledTarget;
             _subst = pCompiledSubst;
-            _relocated = pReloc;
+            _relocated = pRelocated;
         }
 
         protected abstract int GetRelativeJumpDistance(IntPtr target, IntPtr subst);
@@ -64,13 +64,11 @@ namespace NETInterceptor
                 jmp.AppendInt(jmpDistance);
                 jmp.Append(Enumerable.Repeat<byte>(0x90, _size - jmpSize));
                 Debug.Assert(jmp.Length == _size);
-
                 _oldCode = jmp.WriteTo(_target);
 
                 var reJmp = new CodeBlock(_oldCode);
                 reJmp.Append(0xE9);
                 reJmp.AppendInt(GetRelativeJumpDistance(_relocated, _target));
-
                 reJmp.WriteTo(_relocated);
             } else {
                 // TODO: absolute jmp to subst code

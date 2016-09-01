@@ -159,11 +159,19 @@ namespace NETInterceptor
 
         public static object UnsafeInvoke(this MethodInfo @this, object value, object[] args)
         {
-            var rt = Type.GetType("System.Reflection.RuntimeMethodInfo");
-            var unsafeInvoke = rt.GetMethod("UnsafeInvokeInternal", BindingFlags.NonPublic | BindingFlags.Instance);
-             var copy = new object[args.Length];
+            if (@this.GetType() != _rtMethodInfo)
+                throw new NotSupportedException();
+
+            if (args == null)
+                args = new object[0];
+
+            var copy = new object[args.Length];
             Array.Copy(args, copy, args.Length);
-            return unsafeInvoke.Invoke(@this, new object[] { value, args, copy });
+
+            return _unsafeInvoke.Invoke(@this, new object[] { value, args, copy });
         }
+
+        private static readonly Type _rtMethodInfo = Type.GetType("System.Reflection.RuntimeMethodInfo");
+        private static readonly MethodInfo _unsafeInvoke = _rtMethodInfo.GetMethod("UnsafeInvokeInternal", BindingFlags.NonPublic | BindingFlags.Instance);
     }
 }

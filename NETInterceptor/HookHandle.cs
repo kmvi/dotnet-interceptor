@@ -27,8 +27,6 @@ namespace NETInterceptor
             if (_disposed)
                 throw new ObjectDisposedException("HookHandle");
 
-            /*if (args == null)
-                args = new object[0];*/
             var result = ((MethodInfo)_reloc).UnsafeInvoke(value, args);
 
             return result;

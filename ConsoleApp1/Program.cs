@@ -14,9 +14,9 @@ using System.Text;
 
 namespace ConsoleApp1
 {
-    public delegate int Test(string p);
     class Program
     {
+        [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
         static unsafe void Main(string[] args)
         {
 

@@ -29,13 +29,13 @@ namespace NETInterceptor
             var targetMethod = new Method(target);
             var destMethod = new Method(substitute);
 
-            var reloc = DelegateEmitter.CreateMethod(target as MethodInfo);
-            var r = new Method(reloc);
+            var reloc = Emitter.EmitMethod((MethodInfo)target);
+            var relocMethod = new Method(reloc);
 
             var inject = CodeInject.Create(
                 targetMethod.GetCompiledCodeAddress(),
                 destMethod.GetCompiledCodeAddress(),
-                r.GetCompiledCodeAddress());
+                relocMethod.GetCompiledCodeAddress());
 
             inject.Inject();
 
