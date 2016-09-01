@@ -41,7 +41,7 @@ namespace ConsoleApp1
 
         public bool test()
         {
-            var r = (bool)handle.InvokeTarget(this, null);
+            var r = (bool)handle.InvokeTarget(this);
             Console.WriteLine("tset");
             return r;
         }

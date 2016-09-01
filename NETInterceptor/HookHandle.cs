@@ -10,16 +10,17 @@ namespace NETInterceptor
 {
     public class HookHandle : IDisposable
     {
-        private static readonly DelegateEmitter _emitter = new DelegateEmitter();
-
         private bool _disposed;
         private readonly MethodBase _target;
         private readonly CodeInject _inject;
+        private readonly Delegate _delegate;
 
         internal HookHandle(MethodBase target, CodeInject inject)
         {
             _target = target;
             _inject = inject;
+            var type = DelegateEmitter.EmitDelegate(target);
+            _delegate = Marshal.GetDelegateForFunctionPointer(_inject.RelocatedAddress, type);
         }
 
         public object InvokeTarget(object value, params object[] args)
@@ -27,16 +28,17 @@ namespace NETInterceptor
             if (_disposed)
                 throw new ObjectDisposedException("HookHandle");
 
-            if (args == null)
-                args = new object[0];
+            /*if (args == null)
+                args = new object[0];*/
 
             // TODO: use delegate, remove lock
             object result;
-            lock (_target) {
-                _inject.Restore();
+            //lock (_target) {
+                /*_inject.Restore();
                 result = _target.Invoke(value, args);
-                _inject.Inject();
-            }
+                _inject.Inject();*/
+                result = _delegate.DynamicInvoke(value);
+            //}
 
             return result;
         }

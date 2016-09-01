@@ -14,6 +14,11 @@ namespace NETInterceptor
         {
         }
 
+        public CodeBlock(CodeBlock block)
+        {
+            _code.AddRange(block._code);
+        }
+
         public CodeBlock(IEnumerable<byte> instr)
         {
             _code.AddRange(instr);

@@ -26,6 +26,15 @@ namespace NETInterceptor
         protected abstract int GetRelativeJumpDistance(IntPtr target, IntPtr subst);
         protected abstract bool CanMakeRelativeJump(IntPtr target, IntPtr subst);
 
+        public IntPtr RelocatedAddress
+        {
+            get
+            {
+                EnsureNotDisposed();
+                return _relocated.Address;
+            }
+        }
+
         public bool IsInjected
         {
             get {
@@ -55,8 +64,14 @@ namespace NETInterceptor
                 jmp.Append(Enumerable.Repeat<byte>(0x90, _size - jmpSize));
                 Debug.Assert(jmp.Length == _size);
 
-                _relocated = GlobalMemoryBlock.Allocate(_size);
+                _relocated = GlobalMemoryBlock.Allocate(_size + jmpSize);
                 _oldCode = jmp.WriteTo(_target);
+
+                var reJmp = new CodeBlock(_oldCode);
+                reJmp.Append(0xE9);
+                jmp.AppendInt(GetRelativeJumpDistance(_relocated.Address, _target));
+
+                _oldCode.WriteTo(_relocated.Address);
             } else {
                 // TODO: absolute jmp to subst code
                 throw new NotImplementedException();

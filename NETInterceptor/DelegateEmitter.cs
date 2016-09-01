@@ -7,27 +7,44 @@ using System.Text;
 
 namespace NETInterceptor
 {
-    class DelegateEmitter
+    static class DelegateEmitter
     {
-        private readonly Lazy<ModuleBuilder> _builder = new Lazy<ModuleBuilder>(CreateBuilder);
+        private static readonly object _sync = new object();
+        private static readonly Lazy<ModuleBuilder> _builder = new Lazy<ModuleBuilder>(CreateBuilder);
 
-        public DelegateEmitter()
+        public static Type EmitDelegate(MethodBase method)
         {
+            var info = method as MethodInfo;
+            if (info == null)
+                throw new NotSupportedException();
+
+            var args = info.GetParameters().Select(x => x.ParameterType).ToList();
+            if (!info.IsStatic)
+                args.Insert(0, info.DeclaringType);
+
+            return EmitDelegate(args.ToArray(), info.ReturnType);
         }
 
-        public Type EmitDelegate(Type[] args)
+        public static Type EmitDelegate(Type[] args)
         {
             return EmitDelegate(args, typeof(void));
         }
 
-        public Type EmitDelegate(Type[] args, Type ret)
+        public static Type EmitDelegate(Type[] args, Type ret)
         {
             if (args == null)
                 args = new Type[0];
 
+            lock (_sync) {
+                return Emit(args, ret);
+            }
+        }
+
+        private static Type Emit(Type[] args, Type ret)
+        {
             var tb = _builder.Value.DefineType("__" + Guid.NewGuid().ToString("N"),
-                TypeAttributes.Class | TypeAttributes.Public | TypeAttributes.Sealed | TypeAttributes.AnsiClass | TypeAttributes.AutoClass,
-                typeof(MulticastDelegate));
+                            TypeAttributes.Class | TypeAttributes.Public | TypeAttributes.Sealed | TypeAttributes.AnsiClass | TypeAttributes.AutoClass,
+                            typeof(MulticastDelegate));
 
             var cb = tb.DefineConstructor(MethodAttributes.RTSpecialName | MethodAttributes.HideBySig | MethodAttributes.Public,
                 CallingConventions.Standard, new Type[] { typeof(object), typeof(IntPtr) });
