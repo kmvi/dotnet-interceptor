@@ -11,7 +11,7 @@ namespace NETInterceptor
         protected readonly IntPtr _target;
         protected readonly IntPtr _subst;
 
-        protected long[] _oldCode;
+        protected CodeBlock _oldCode;
         protected int _size;
         protected bool _injected;
         protected bool _disposed;
@@ -42,26 +42,21 @@ namespace NETInterceptor
                 throw new InvalidOperationException();
 
             if (CanMakeRelativeJump(_target, _subst)) {
-                int jmpDistance = GetRelativeJumpDistance(_target, _subst);
-                var relJmpBytes = BitConverter.GetBytes(jmpDistance);
+                const int jmpSize = 5;
 
-                var ptr = Utils.FindNearestOp(_target, 5);
+                int jmpDistance = GetRelativeJumpDistance(_target, _subst);                
+                var ptr = Utils.FindNearestOp(_target, jmpSize);
                 _size = (int)(ptr.ToInt64() - _target.ToInt64());
                 Debug.Assert(_size <= 16);
 
-                var jmp = new byte[8] {
-                    0xE9, relJmpBytes[0], relJmpBytes[1], relJmpBytes[2], relJmpBytes[3],
-                    0, 0, 0,
-                };
-                var code = BitConverter.ToInt64(jmp, 0);
+                var jmp = new CodeBlock();
+                jmp.Append(0xE9);
+                jmp.AppendInt(jmpDistance);
+                jmp.Append(Enumerable.Repeat<byte>(0x90, _size - jmpSize));
+                Debug.Assert(jmp.Length == _size);
 
                 _relocated = GlobalMemoryBlock.Allocate(_size);
-
-                if (_size <= 8) {                    
-                    _oldCode = WriteCode(new[] { code }, _size);
-                } else {
-                    _oldCode = WriteCode(new[] { code, 0L }, _size);
-                }
+                _oldCode = jmp.WriteTo(_target);
             } else {
                 // TODO: absolute jmp to subst code
                 throw new NotImplementedException();
@@ -77,29 +72,11 @@ namespace NETInterceptor
             if (!_injected)
                 throw new InvalidOperationException();
 
-            WriteCode(_oldCode, _size);
+            _oldCode.WriteTo(_target);
+
+            _relocated.Dispose();
 
             _injected = false;
-        }
-
-        private unsafe long[] WriteCode(long[] code, int size)
-        {
-            using (var block = new WritableMemoryBlock(_target, size)) {
-                var ptr = (long*)_target.ToPointer();
-                var oldCode = new long[code.Length];
-                for (int i = 0; i < code.Length; ++i, ++ptr, size -= 8) {
-                    int sz = size < 8 ? size : 8;
-                    if (sz < 8) {
-                        long mask = (1L << (sz * 8)) - 1L;
-                        oldCode[i] = *ptr;
-                        *ptr = (code[i] & mask) | (oldCode[i] & ~mask);
-                    } else {
-                        oldCode[i] = *ptr;
-                        *ptr = code[i];
-                    }
-                }
-                return oldCode;
-            }
         }
 
         public void Dispose()

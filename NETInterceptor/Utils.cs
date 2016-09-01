@@ -118,16 +118,16 @@ namespace NETInterceptor
                 ptr = IntPtr.Add(ptr, instr.Operands[0].LvalSDWord + 5);
             }
 
-            return IntPtr.Zero;
+            return ptr;
         }
 
-        public static IntPtr FindNearestOp(IntPtr ptr, int minSize)
+        public static IntPtr FindNearestOp(IntPtr ptr, int minOffset)
         {
             int len = 0;
             var archMode = Utils.CurrentArchitecture.ToArchitectureMode();
             var disasm = new Disassembler(ptr, 20, archMode);
 
-            while (len < minSize) {                
+            while (len < minOffset) {                
                 var instr = disasm.NextInstruction();
                 len += instr.Length;
                 ptr = IntPtr.Add(ptr, instr.Length);
@@ -146,6 +146,14 @@ namespace NETInterceptor
             value |= value >> 16;
             value++;
             return value;
+        }
+
+        public static T[] ConcatArray<T>(T[] a1, T[] a2)
+        {
+            var result = new T[a1.Length + a2.Length];
+            a1.CopyTo(result, 0);
+            a2.CopyTo(result, a1.Length);
+            return result;
         }
     }
 }

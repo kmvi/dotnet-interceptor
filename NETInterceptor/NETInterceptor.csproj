@@ -48,6 +48,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CodeBlock.cs" />
     <Compile Include="CodeInject.cs" />
     <Compile Include="DelegateEmitter.cs" />
     <Compile Include="FixupPrecode.cs" />

@@ -30,13 +30,11 @@ namespace ConsoleApp1
 
             var addr = new Method(target).GetCompiledCodeAddress();
 
-            RuntimeHelpers.PrepareMethod(subst.MethodHandle);
-            Utils.FollowRelJmp(subst.MethodHandle.GetFunctionPointer());
 
-            /*handle = Intercept.On(target, subst);
+            handle = Intercept.On(target, subst);
             var d = new DirectoryInfo("d:\\");
             var e = d.Exists;
-            handle.Dispose();*/
+            handle.Dispose();
         }
 
         private static HookHandle handle;
