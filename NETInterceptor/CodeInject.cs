@@ -27,15 +27,6 @@ namespace NETInterceptor
         protected abstract int GetRelativeJumpDistance(IntPtr target, IntPtr subst);
         protected abstract bool CanMakeRelativeJump(IntPtr target, IntPtr subst);
 
-        public IntPtr RelocatedAddress
-        {
-            get
-            {
-                EnsureNotDisposed();
-                return _relocated;
-            }
-        }
-
         public bool IsInjected
         {
             get {
