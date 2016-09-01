@@ -13,7 +13,7 @@ namespace NETInterceptor
     */
     public unsafe abstract class FixupPrecode : Precode
     {
-        protected static Lazy<IntPtr> _precodeFixupThunk = new Lazy<IntPtr>(GetPrecodeFixupThunk);
+        protected static IntPtr _precodeFixupThunk = GetPrecodeFixupThunk();
 
         protected FixupPrecode(IntPtr methodPtr)
             : base(methodPtr)
@@ -98,7 +98,7 @@ namespace NETInterceptor
                 (b2 == 0xCC || b2 == 0x5E || b2 == 0x5F);
         }
 
-        public static IntPtr PrecodeFixupThunk { get { return _precodeFixupThunk.Value; } }
+        public static IntPtr PrecodeFixupThunk { get { return _precodeFixupThunk; } }
 
         private static IntPtr GetPrecodeFixupThunk()
         {

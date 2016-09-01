@@ -10,7 +10,7 @@ namespace NETInterceptor
     public static class Emitter
     {
         private static readonly object _sync = new object();
-        private static readonly Lazy<ModuleBuilder> _builder = new Lazy<ModuleBuilder>(CreateBuilder);
+        private static readonly ModuleBuilder _builder = CreateBuilder();
 
         public static Type EmitDelegate(Type[] args)
         {
@@ -29,7 +29,7 @@ namespace NETInterceptor
 
         private static Type Emit(Type[] args, Type ret)
         {
-            var tb = _builder.Value.DefineType("__" + Guid.NewGuid().ToString("N"),
+            var tb = _builder.DefineType("__" + Guid.NewGuid().ToString("N"),
                             TypeAttributes.Class | TypeAttributes.Public | TypeAttributes.Sealed | TypeAttributes.AnsiClass | TypeAttributes.AutoClass,
                             typeof(MulticastDelegate));
 
@@ -54,7 +54,7 @@ namespace NETInterceptor
 
         private static MethodInfo EmitMethodInternal(MethodInfo info)
         {
-            var tb = _builder.Value.DefineType("__" + Guid.NewGuid().ToString("N"),
+            var tb = _builder.DefineType("__" + Guid.NewGuid().ToString("N"),
                             TypeAttributes.Class | TypeAttributes.Public | TypeAttributes.AnsiClass | TypeAttributes.AutoClass);
 
             var cb = tb.DefineConstructor(MethodAttributes.Public,

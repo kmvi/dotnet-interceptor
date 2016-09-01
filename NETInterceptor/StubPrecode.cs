@@ -74,7 +74,7 @@ namespace NETInterceptor
 
             public override IntPtr JmpToTargetPtr
             {
-                get { return IntPtr.Add(_methodPtr, 7); }
+                get { return _methodPtr.Plus(7); }
             }
         }
 
@@ -121,7 +121,7 @@ namespace NETInterceptor
 
             public override IntPtr JmpToTargetPtr
             {
-                get { return IntPtr.Add(_methodPtr, 10); }
+                get { return _methodPtr.Plus(10); }
             }
         }
     }

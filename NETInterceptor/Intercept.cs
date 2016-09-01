@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -10,8 +9,8 @@ namespace NETInterceptor
 {
     public static class Intercept
     {
-        internal static readonly ConcurrentDictionary<MethodBase, object> HookedMethods =
-            new ConcurrentDictionary<MethodBase, object>();
+        internal static readonly Dictionary<MethodBase, object> HookedMethods =
+            new Dictionary<MethodBase, object>();
 
         public static HookHandle On(MethodBase target, MethodBase substitute)
         {
@@ -23,8 +22,10 @@ namespace NETInterceptor
 
             CheckSignatures(target, substitute);
 
-            if (!HookedMethods.TryAdd(target, null))
+            if (HookedMethods.ContainsKey(target))
                 throw new InvalidOperationException();
+
+            HookedMethods.Add(target, null);
 
             var targetMethod = new Method(target);
             var destMethod = new Method(substitute);

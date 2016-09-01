@@ -38,10 +38,7 @@ namespace NETInterceptor
                 if (_inject.IsInjected)
                     _inject.Restore();
 
-                object tmp;
-                var result = Intercept.HookedMethods.TryRemove(_target, out tmp);
-                Debug.Assert(result);
-
+                var result = Intercept.HookedMethods.Remove(_target);
                 _disposed = true;
             }
         }

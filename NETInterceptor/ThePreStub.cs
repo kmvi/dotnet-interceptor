@@ -8,7 +8,7 @@ namespace NETInterceptor
 {
     public abstract class ThePreStub
     {
-        private static readonly Lazy<ThePreStub> _instance = new Lazy<ThePreStub>(Create);
+        private static readonly ThePreStub _instance = Create();
         private readonly IntPtr _preStubPtr;
 
         protected ThePreStub(IntPtr preStubPtr)
@@ -18,7 +18,7 @@ namespace NETInterceptor
 
         public static ThePreStub Instance 
         {
-            get { return _instance.Value; }
+            get { return _instance; }
         }
 
         public IntPtr ThePreStubPtr { get { return _preStubPtr; } }

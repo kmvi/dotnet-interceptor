@@ -82,7 +82,7 @@ namespace NETInterceptor
 
             public override IntPtr JmpToTargetPtr
             {
-                get { return IntPtr.Add(_methodPtr, 11); }
+                get { return _methodPtr.Plus(11); }
             }
         }
 

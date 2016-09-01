@@ -1,5 +1,4 @@
 ﻿using NETInterceptor;
-using SharpDisasm;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -25,7 +24,11 @@ namespace ConsoleApp1
             // var ptr = typeof(MarshalByRefObject).GetMethod("GetLifetimeService").MethodHandle.GetFunctionPointer();
             ////Utils.Dump(ptr, 70);
 
-            var target = typeof(DirectoryInfo).GetProperty("Exists").GetGetMethod();
+            m();
+
+            var p = ThePreStub.Instance.PreStubWorker;
+
+            /*var target = typeof(DirectoryInfo).GetProperty("Exists").GetGetMethod();
             var subst = typeof(Program).GetMethod("test");
 
             var addr = new Method(target).GetCompiledCodeAddress();
@@ -34,7 +37,7 @@ namespace ConsoleApp1
             handle = Intercept.On(target, subst);
             var d = new DirectoryInfo("d:\\");
             var e = d.Exists;
-            handle.Dispose();
+            handle.Dispose();*/
 
         }
 

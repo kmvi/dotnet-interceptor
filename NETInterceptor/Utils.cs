@@ -25,7 +25,7 @@ namespace NETInterceptor
     {
         public static Architecture CurrentArchitecture
         {
-            get { return Environment.Is64BitProcess ? Architecture.X64 : Architecture.X86; }
+            get { return IntPtr.Size == 8 ? Architecture.X64 : Architecture.X86; }
         }
 
         public static Runtime CurrentRuntime
@@ -114,7 +114,7 @@ namespace NETInterceptor
                     break;
                 }
                 Debug.Assert(instr.Operands.Length == 1);
-                ptr = IntPtr.Add(ptr, instr.Operands[0].LvalSDWord + 5);
+                ptr = ptr.Plus(instr.Operands[0].LvalSDWord + 5);
             }
 
             return ptr;
@@ -129,7 +129,7 @@ namespace NETInterceptor
             while (len < minOffset) {                
                 var instr = disasm.NextInstruction();
                 len += instr.Length;
-                ptr = IntPtr.Add(ptr, instr.Length);
+                ptr = ptr.Plus(instr.Length);
             }
 
             return ptr;
@@ -167,6 +167,11 @@ namespace NETInterceptor
             Array.Copy(args, copy, args.Length);
 
             return _unsafeInvoke.Invoke(@this, new object[] { value, args, copy });
+        }
+
+        public unsafe static IntPtr Plus(this IntPtr ptr, int offset)
+        {
+            return new IntPtr(ptr.ToBytePtr() + offset);
         }
 
         private static readonly Type _rtMethodInfo = Type.GetType("System.Reflection.RuntimeMethodInfo");
