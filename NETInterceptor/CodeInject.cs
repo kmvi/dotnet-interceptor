@@ -15,12 +15,13 @@ namespace NETInterceptor
         protected int _size;
         protected bool _injected;
         protected bool _disposed;
-        protected GlobalMemoryBlock _relocated;
+        protected IntPtr _relocated;
 
-        protected CodeInject(IntPtr pCompiledTarget, IntPtr pCompiledSubst)
+        protected CodeInject(IntPtr pCompiledTarget, IntPtr pCompiledSubst, IntPtr pReloc)
         {
             _target = pCompiledTarget;
             _subst = pCompiledSubst;
+            _relocated = pReloc;
         }
 
         protected abstract int GetRelativeJumpDistance(IntPtr target, IntPtr subst);
@@ -31,7 +32,7 @@ namespace NETInterceptor
             get
             {
                 EnsureNotDisposed();
-                return _relocated.Address;
+                return _relocated;
             }
         }
 
@@ -64,14 +65,13 @@ namespace NETInterceptor
                 jmp.Append(Enumerable.Repeat<byte>(0x90, _size - jmpSize));
                 Debug.Assert(jmp.Length == _size);
 
-                _relocated = GlobalMemoryBlock.Allocate(_size + jmpSize);
                 _oldCode = jmp.WriteTo(_target);
 
                 var reJmp = new CodeBlock(_oldCode);
                 reJmp.Append(0xE9);
-                jmp.AppendInt(GetRelativeJumpDistance(_relocated.Address, _target));
+                reJmp.AppendInt(GetRelativeJumpDistance(_relocated, _target));
 
-                _oldCode.WriteTo(_relocated.Address);
+                reJmp.WriteTo(_relocated);
             } else {
                 // TODO: absolute jmp to subst code
                 throw new NotImplementedException();
@@ -89,7 +89,7 @@ namespace NETInterceptor
 
             _oldCode.WriteTo(_target);
 
-            _relocated.Dispose();
+           // _relocated.Dispose();
 
             _injected = false;
         }
@@ -109,13 +109,13 @@ namespace NETInterceptor
                 throw new ObjectDisposedException("CodeInject");
         }
 
-        public static CodeInject Create(IntPtr pCompiledTarget, IntPtr pCompiledDest)
+        public static CodeInject Create(IntPtr pCompiledTarget, IntPtr pCompiledDest, IntPtr pRelocated)
         {
             switch (Utils.CurrentArchitecture) {
                 case Architecture.X86:
-                    return new CodeInjectX86(pCompiledTarget, pCompiledDest);
+                    return new CodeInjectX86(pCompiledTarget, pCompiledDest, pRelocated);
                 case Architecture.X64:
-                    return new CodeInjectX64(pCompiledTarget, pCompiledDest);
+                    return new CodeInjectX64(pCompiledTarget, pCompiledDest, pRelocated);
                 default:
                     throw new NotSupportedException("Unsupported architecture.");
             }
@@ -123,8 +123,8 @@ namespace NETInterceptor
 
         private class CodeInjectX86 : CodeInject
         {
-            public CodeInjectX86(IntPtr pCompiledTarget, IntPtr pCompiledDest)
-                : base(pCompiledTarget, pCompiledDest)
+            public CodeInjectX86(IntPtr pCompiledTarget, IntPtr pCompiledDest, IntPtr pRelocated)
+                : base(pCompiledTarget, pCompiledDest, pRelocated)
             {
             }
 
@@ -141,8 +141,8 @@ namespace NETInterceptor
 
         private class CodeInjectX64 : CodeInject
         {
-            public CodeInjectX64(IntPtr pCompiledTarget, IntPtr pCompiledDest)
-                : base(pCompiledTarget, pCompiledDest)
+            public CodeInjectX64(IntPtr pCompiledTarget, IntPtr pCompiledDest, IntPtr pRelocated)
+                : base(pCompiledTarget, pCompiledDest, pRelocated)
             {
             }
 

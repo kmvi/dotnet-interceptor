@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -154,6 +155,15 @@ namespace NETInterceptor
             a1.CopyTo(result, 0);
             a2.CopyTo(result, a1.Length);
             return result;
+        }
+
+        public static object UnsafeInvoke(this MethodInfo @this, object value, object[] args)
+        {
+            var rt = Type.GetType("System.Reflection.RuntimeMethodInfo");
+            var unsafeInvoke = rt.GetMethod("UnsafeInvokeInternal", BindingFlags.NonPublic | BindingFlags.Instance);
+             var copy = new object[args.Length];
+            Array.Copy(args, copy, args.Length);
+            return unsafeInvoke.Invoke(@this, new object[] { value, args, copy });
         }
     }
 }

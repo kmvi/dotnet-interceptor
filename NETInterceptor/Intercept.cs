@@ -29,12 +29,17 @@ namespace NETInterceptor
             var targetMethod = new Method(target);
             var destMethod = new Method(substitute);
 
+            var reloc = DelegateEmitter.CreateMethod(target as MethodInfo);
+            var r = new Method(reloc);
+
             var inject = CodeInject.Create(
-                targetMethod.GetCompiledCodeAddress(), destMethod.GetCompiledCodeAddress());
+                targetMethod.GetCompiledCodeAddress(),
+                destMethod.GetCompiledCodeAddress(),
+                r.GetCompiledCodeAddress());
 
             inject.Inject();
 
-            return new HookHandle(target, inject);
+            return new HookHandle(target, reloc, inject);
         }
 
         private static void CheckSignatures(MethodBase target, MethodBase substitute)

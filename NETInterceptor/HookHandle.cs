@@ -13,14 +13,13 @@ namespace NETInterceptor
         private bool _disposed;
         private readonly MethodBase _target;
         private readonly CodeInject _inject;
-        private readonly Delegate _delegate;
+        private readonly MethodBase _reloc;
 
-        internal HookHandle(MethodBase target, CodeInject inject)
+        internal HookHandle(MethodBase target, MethodBase reloc, CodeInject inject)
         {
             _target = target;
             _inject = inject;
-            var type = DelegateEmitter.EmitDelegate(target);
-            _delegate = Marshal.GetDelegateForFunctionPointer(_inject.RelocatedAddress, type);
+            _reloc = reloc;
         }
 
         public object InvokeTarget(object value, params object[] args)
@@ -30,15 +29,7 @@ namespace NETInterceptor
 
             /*if (args == null)
                 args = new object[0];*/
-
-            // TODO: use delegate, remove lock
-            object result;
-            //lock (_target) {
-                /*_inject.Restore();
-                result = _target.Invoke(value, args);
-                _inject.Inject();*/
-                result = _delegate.DynamicInvoke(value);
-            //}
+            var result = ((MethodInfo)_reloc).UnsafeInvoke(value, args);
 
             return result;
         }

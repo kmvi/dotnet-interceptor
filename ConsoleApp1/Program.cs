@@ -14,6 +14,7 @@ using System.Text;
 
 namespace ConsoleApp1
 {
+    public delegate int Test(string p);
     class Program
     {
         static unsafe void Main(string[] args)
@@ -35,6 +36,7 @@ namespace ConsoleApp1
             var d = new DirectoryInfo("d:\\");
             var e = d.Exists;
             handle.Dispose();
+
         }
 
         private static HookHandle handle;
@@ -44,6 +46,11 @@ namespace ConsoleApp1
             var r = (bool)handle.InvokeTarget(this);
             Console.WriteLine("tset");
             return r;
+        }
+
+        public static void m()
+        {
+            Console.WriteLine("hello");
         }
     }
 

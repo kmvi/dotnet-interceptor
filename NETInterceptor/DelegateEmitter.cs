@@ -7,7 +7,7 @@ using System.Text;
 
 namespace NETInterceptor
 {
-    static class DelegateEmitter
+    public static class DelegateEmitter
     {
         private static readonly object _sync = new object();
         private static readonly Lazy<ModuleBuilder> _builder = new Lazy<ModuleBuilder>(CreateBuilder);
@@ -19,8 +19,8 @@ namespace NETInterceptor
                 throw new NotSupportedException();
 
             var args = info.GetParameters().Select(x => x.ParameterType).ToList();
-            if (!info.IsStatic)
-                args.Insert(0, info.DeclaringType);
+            /*if (!info.IsStatic)
+                args.Insert(0, info.DeclaringType);*/
 
             return EmitDelegate(args.ToArray(), info.ReturnType);
         }
@@ -56,6 +56,47 @@ namespace NETInterceptor
             mb.SetImplementationFlags(MethodImplAttributes.Runtime | MethodImplAttributes.Managed);
 
             return tb.CreateType();
+        }
+
+        public static MethodInfo CreateMethod(MethodInfo info)
+        {
+            var tb = _builder.Value.DefineType("__" + Guid.NewGuid().ToString("N"),
+                            TypeAttributes.Class | TypeAttributes.Public | TypeAttributes.Sealed | TypeAttributes.AnsiClass | TypeAttributes.AutoClass);
+
+            var cb = tb.DefineConstructor(MethodAttributes.Public,
+                CallingConventions.Standard, new Type[] {  });
+
+            var gen = cb.GetILGenerator();
+            gen.Emit(OpCodes.Ret);
+
+            var mname = "__" + Guid.NewGuid().ToString("N");
+            var mb = tb.DefineMethod(mname, MethodAttributes.Public, info.ReturnType, info.GetParameters().Select(x=>x.ParameterType).ToArray());
+
+            gen = mb.GetILGenerator();
+            gen.Emit(OpCodes.Nop);
+            gen.Emit(OpCodes.Nop);
+            gen.Emit(OpCodes.Nop);
+            gen.Emit(OpCodes.Nop);
+            gen.Emit(OpCodes.Nop);
+            gen.Emit(OpCodes.Nop);
+            gen.Emit(OpCodes.Nop);
+            gen.Emit(OpCodes.Nop);
+            gen.Emit(OpCodes.Nop);
+            gen.Emit(OpCodes.Nop);
+            gen.Emit(OpCodes.Nop);
+            gen.Emit(OpCodes.Nop);
+            gen.Emit(OpCodes.Nop);
+            gen.Emit(OpCodes.Nop);
+            gen.Emit(OpCodes.Nop);
+            gen.Emit(OpCodes.Nop);
+            var loc = gen.DeclareLocal(info.ReturnType);
+            gen.Emit(OpCodes.Ldloc, loc);
+            gen.Emit(OpCodes.Initobj, info.ReturnType);
+            gen.Emit(OpCodes.Ldloc, loc);
+            gen.Emit(OpCodes.Ret);
+
+            var t = tb.CreateType();
+            return t.GetMethod(mname);
         }
 
         private static ModuleBuilder CreateBuilder()
