@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -89,7 +90,78 @@ namespace NETInterceptor
             {
                 get {
                     if (Utils.CurrentRuntime == Runtime.CLR2) {
-                        throw new NotImplementedException();
+                        #region listing
+                        /*
+                           0:   48 8d 44 24 08          lea    rax,[rsp+0x8]
+                           5:   41 52                   push   r10
+                           7:   41 57                   push   r15
+                           9:   41 56                   push   r14
+                           b:   41 55                   push   r13
+                           d:   41 54                   push   r12
+                           f:   55                      push   rbp
+                          10:   53                      push   rbx
+                          11:   56                      push   rsi
+                          12:   57                      push   rdi
+                          13:   50                      push   rax
+                          14:   48 83 ec 78             sub    rsp,0x78
+                          18:   48 89 8c 24 d0 00 00    mov    QWORD PTR [rsp+0xd0],rcx
+                          1f:   00
+                          20:   48 89 94 24 d8 00 00    mov    QWORD PTR [rsp+0xd8],rdx
+                          27:   00
+                          28:   4c 89 84 24 e0 00 00    mov    QWORD PTR [rsp+0xe0],r8
+                          2f:   00
+                          30:   4c 89 8c 24 e8 00 00    mov    QWORD PTR [rsp+0xe8],r9
+                          37:   00
+                          38:   66 0f 7f 44 24 20       movdqa XMMWORD PTR [rsp+0x20],xmm0
+                          3e:   66 0f 7f 4c 24 30       movdqa XMMWORD PTR [rsp+0x30],xmm1
+                          44:   66 0f 7f 54 24 40       movdqa XMMWORD PTR [rsp+0x40],xmm2
+                          4a:   66 0f 7f 5c 24 50       movdqa XMMWORD PTR [rsp+0x50],xmm3
+                          50:   e8 6f 8f ff ff          call   0xffffffffffff8fc4 ; <-------- PrestubMethodFrame::GetMethodFrameVPtr
+                          55:   48 89 44 24 68          mov    QWORD PTR [rsp+0x68],rax
+                          5a:   48 8b 05 1f 8f d8 ff    mov    rax,QWORD PTR [rip+0xffffffffffd88f1f]        # 0xffffffffffd88f80
+                          61:   48 89 44 24 60          mov    QWORD PTR [rsp+0x60],rax
+                          66:   e8 e5 cd ff ff          call   0xffffffffffffce50 ; <-------- GetThread
+                          6b:   4c 8b e0                mov    r12,rax
+                          6e:   49 8b 54 24 10          mov    rdx,QWORD PTR [r12+0x10]
+                          73:   48 89 54 24 70          mov    QWORD PTR [rsp+0x70],rdx
+                          78:   48 8d 4c 24 68          lea    rcx,[rsp+0x68]
+                          7d:   49 89 4c 24 10          mov    QWORD PTR [r12+0x10],rcx
+                          82:   e8 19 71 ee ff          call   0xffffffffffee71a0 ; <------- PreStubWorker
+                          87:   49 8b 4c 24 10          mov    rcx,QWORD PTR [r12+0x10]
+                          8c:   48 8b 51 08             mov    rdx,QWORD PTR [rcx+0x8]
+                          90:   49 89 54 24 10          mov    QWORD PTR [r12+0x10],rdx
+                          95:   66 0f 6f 44 24 20       movdqa xmm0,XMMWORD PTR [rsp+0x20]
+                          9b:   66 0f 6f 4c 24 30       movdqa xmm1,XMMWORD PTR [rsp+0x30]
+                          a1:   66 0f 6f 54 24 40       movdqa xmm2,XMMWORD PTR [rsp+0x40]
+                          a7:   66 0f 6f 5c 24 50       movdqa xmm3,XMMWORD PTR [rsp+0x50]
+                          ad:   48 8b 8c 24 d0 00 00    mov    rcx,QWORD PTR [rsp+0xd0]
+                          b4:   00
+                          b5:   48 8b 94 24 d8 00 00    mov    rdx,QWORD PTR [rsp+0xd8]
+                          bc:   00
+                          bd:   4c 8b 84 24 e0 00 00    mov    r8,QWORD PTR [rsp+0xe0]
+                          c4:   00
+                          c5:   4c 8b 8c 24 e8 00 00    mov    r9,QWORD PTR [rsp+0xe8]
+                          cc:   00
+                          cd:   90                      nop
+                          ce:   48 81 c4 80 00 00 00    add    rsp,0x80
+                          d5:   5f                      pop    rdi
+                          d6:   5e                      pop    rsi
+                          d7:   5b                      pop    rbx
+                          d8:   5d                      pop    rbp
+                          d9:   41 5c                   pop    r12
+                          db:   41 5d                   pop    r13
+                          dd:   41 5e                   pop    r14
+                          df:   41 5f                   pop    r15
+                          e1:   41 5a                   pop    r10
+                          e3:   48 ff e0                rex.W jmp rax
+                        */
+                        #endregion
+                        var ptr = ThePreStubPtr.ToBytePtr();
+                        Debug.Assert(*(ulong*)ptr == 0x4152410824448D48UL);
+                        ptr += 0x82;
+                        Debug.Assert(*ptr == 0xE8);
+                        var offset = *(int*)(ptr + 1);
+                        return new IntPtr(ptr + offset + 5);
                     }
 
                     if (Utils.CurrentRuntime == Runtime.CLR4) {
