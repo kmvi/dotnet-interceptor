@@ -50,6 +50,7 @@ namespace NETInterceptor
 
         public int Length { get { return _code.Count; } }
 
+        // TODO: use CAS to write data
         public unsafe CodeBlock WriteTo(IntPtr target)
         {
             if (_code.Count == 0)

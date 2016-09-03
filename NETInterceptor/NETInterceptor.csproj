@@ -33,9 +33,9 @@
     <Compile Include="HookHandle.cs" />
     <Compile Include="Intercept.cs" />
     <Compile Include="GlobalMemoryBlock.cs" />
+    <Compile Include="Lazy.cs" />
     <Compile Include="MemoryBlock.cs" />
     <Compile Include="Method.cs" />
-    <Compile Include="MethodDesc.cs" />
     <Compile Include="Precode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RemotingPrecode.cs" />
