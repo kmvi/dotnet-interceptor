@@ -42,8 +42,7 @@ namespace NETInterceptor
             get
             {
                 var ptr = _methodPtr.ToBytePtr();
-                var operand = new IntPtr(*(int*)(ptr + 1));
-                return operand != PrecodeFixupThunk &&
+                return GetPrecodeJmpAddress() != PrecodeFixupThunk &&
                     (*(ptr + 5) == 0xCC || *(ptr + 5) == 0x5F);
             }
         }
@@ -54,9 +53,7 @@ namespace NETInterceptor
             {
                 if (IsJitted) {
                     // return CompiledMethod addr
-                    var ptr = _methodPtr.ToBytePtr();
-                    var offset = *(int *)(ptr + 1);
-                    return new IntPtr(ptr + offset + 5);
+                    return GetPrecodeJmpAddress();
                 } else {
                     // return ThePreStub addr via PrecodeFixupThunk
                     // e8 xx xx xx xx ; call PrecodeFixupThunk
@@ -82,6 +79,13 @@ namespace NETInterceptor
         }
 
         protected abstract byte* GetThePreStubPtr(byte* precodeFixupThunkPtr);
+
+        private IntPtr GetPrecodeJmpAddress()
+        {
+            var ptr = _methodPtr.ToBytePtr();
+            var offset = *(int*)(ptr + 1);
+            return new IntPtr(ptr + offset + 5);
+        }
 
         private byte* GetMethodDescChunkBasePtr()
         {
