@@ -131,7 +131,25 @@ namespace NETInterceptor
             protected override byte* GetThePreStubPtr(byte* precodeFixupThunkPtr)
             {
                 if (Utils.CurrentRuntime == Runtime.CLR2) {
-                    throw new NotImplementedException();
+                    /*
+                     0:   58                      pop    eax
+                     1:   56                      push   esi
+                     2:   57                      push   edi
+                     3:   0f b6 70 02             movzx  esi,BYTE PTR [eax+0x2]
+                     7:   0f b6 78 01             movzx  edi,BYTE PTR [eax+0x1]
+                     b:   8b 44 f0 03             mov    eax,DWORD PTR [eax+esi*8+0x3]
+                     f:   8d 04 b8                lea    eax,[eax+edi*4]
+                    12:   5f                      pop    edi
+                    13:   5e                      pop    esi
+                    14:   ff 25 c8 22 71 79       jmp    DWORD PTR ds:0x797122c8 ; g_dwPreStubAddr
+                     */
+
+                    Debug.Assert(*(uint*)precodeFixupThunkPtr == 0x0F575658);
+                    precodeFixupThunkPtr += 0x14;
+                    Debug.Assert(*(ushort*)precodeFixupThunkPtr == 0x25FF);
+                    var g_dwPreStubAddr = *(byte***)(precodeFixupThunkPtr + 2);
+
+                    return *g_dwPreStubAddr;
                 }
                 
                 if (Utils.CurrentRuntime >= Runtime.CLR4) {
