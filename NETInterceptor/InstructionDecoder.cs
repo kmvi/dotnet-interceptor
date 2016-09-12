@@ -43,13 +43,14 @@ namespace NETInterceptor
 
         public IEnumerator<Instruction> GetEnumerator()
         {
-            if (Utils.CurrentArchitecture == Architecture.X64)
-                return new InstructionLengthEnumerator64(new ByteEnumerator(_code.GetEnumerator()));
-
-            if (Utils.CurrentArchitecture == Architecture.X86)
-                return new InstructionLengthEnumerator86(new ByteEnumerator(_code.GetEnumerator()));
-
-            throw new NotSupportedException("Unsupported architecture.");
+            switch (Utils.CurrentArchitecture) {
+                case Architecture.X64:
+                    return new InstructionLengthEnumerator64(new ByteEnumerator(_code.GetEnumerator()));
+                case Architecture.X86:
+                    return new InstructionLengthEnumerator86(new ByteEnumerator(_code.GetEnumerator()));
+                default:
+                    throw new NotSupportedException("Unsupported architecture.");
+            }
         }
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()

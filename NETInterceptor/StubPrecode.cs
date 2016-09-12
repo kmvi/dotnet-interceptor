@@ -51,9 +51,8 @@ namespace NETInterceptor
             {
                 get
                 {
-                    var ptr = JmpToTargetPtr.ToBytePtr();
-                    var offset = *(int *)(ptr + 1);
-                    return new IntPtr(ptr + offset + 5);
+                    byte* ptr = JmpToTargetPtr.ToBytePtr();
+                    return new IntPtr(Utils.JmpOrCallDest(ptr));
                 }
             }
 
@@ -61,14 +60,14 @@ namespace NETInterceptor
             {
                 get
                 {
-                    var ptr = _methodPtr.ToBytePtr();
+                    byte* ptr = _methodPtr.ToBytePtr();
                     return new IntPtr(*(int*)(ptr + 1));
                 }
             }
 
             public new static bool IsStubPrecode(IntPtr methodPtr)
             {
-                var code = *(ulong *)methodPtr.ToPointer();
+                var code = *(ulong*)methodPtr.ToPointer();
                 return (code & 0xFFFFFF00000000FF) == 0xE9ED8900000000B8;
             }
 
@@ -94,9 +93,8 @@ namespace NETInterceptor
             {
                 get
                 {
-                    var ptr = JmpToTargetPtr.ToBytePtr();
-                    var offset = *(int*)(ptr + 2);
-                    return new IntPtr(ptr + offset + 6);
+                    var ptr = JmpToTargetPtr.ToBytePtr() + 1;
+                    return new IntPtr(Utils.JmpOrCallDest(ptr));
                 }
             }
 

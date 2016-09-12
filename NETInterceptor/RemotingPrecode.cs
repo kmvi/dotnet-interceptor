@@ -55,9 +55,8 @@ namespace NETInterceptor
             {
                 get
                 {
-                    var ptr = JmpToTargetPtr.ToBytePtr();
-                    var offset = *(int*)(ptr + 1);
-                    return new IntPtr(ptr + offset + 5);
+                    byte* ptr = JmpToTargetPtr.ToBytePtr();
+                    return new IntPtr(Utils.JmpOrCallDest(ptr));
                 }
             }
 
@@ -132,8 +131,8 @@ namespace NETInterceptor
 
             public new static bool IsRemotingPrecode(IntPtr methodPtr)
             {
-                var code = *(uint *)methodPtr.ToPointer();
-                return code == 0x74C98548U;
+                var code = *(ulong *)methodPtr.ToPointer();
+                return (code & 0xFFFFFF00FFFFFFFFUL) == 0x018B480074C98548UL;
             }
 
             // returns TargetPtr since absolute jmp used

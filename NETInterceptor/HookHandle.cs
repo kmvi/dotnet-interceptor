@@ -37,8 +37,7 @@ namespace NETInterceptor
             if (!_disposed) {
                 if (_inject.IsInjected)
                     _inject.Restore();
-
-                var result = Intercept.HookedMethods.Remove(_target);
+                Intercept.HookedMethods.Remove(_target);
                 _disposed = true;
             }
         }

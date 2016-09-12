@@ -119,16 +119,11 @@ namespace NETInterceptor
             return ptr;
         }
 
-        public static int UpperPowerOfTwo(int value)
+        internal unsafe static byte* JmpOrCallDest(byte *code)
         {
-            value--;
-            value |= value >> 1;
-            value |= value >> 2;
-            value |= value >> 4;
-            value |= value >> 8;
-            value |= value >> 16;
-            value++;
-            return value;
+            Debug.Assert(*code == 0xE9 || *code == 0xE8);
+            var offset = *(int*)(code + 1);
+            return code + offset + 5;
         }
 
         public static T[] ConcatArray<T>(T[] a1, T[] a2)
