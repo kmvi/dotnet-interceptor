@@ -1,6 +1,4 @@
-﻿using SharpDisasm;
-using SharpDisasm.Udis86;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
@@ -86,18 +84,6 @@ namespace NETInterceptor
             return ReadBlock((byte*)ptr.ToPointer(), length);
         }
 
-        internal static ArchitectureMode ToArchitectureMode(this Architecture arch)
-        {
-            switch (arch) {
-                case Architecture.X86:
-                    return SharpDisasm.ArchitectureMode.x86_32;
-                case Architecture.X64:
-                    return SharpDisasm.ArchitectureMode.x86_64;
-                default:
-                    throw new NotSupportedException("Unsupported architecture.");
-            }
-        }
-
         internal unsafe static byte* ToBytePtr(this IntPtr ptr)
         {
             return (byte*)ptr.ToPointer();
@@ -105,17 +91,14 @@ namespace NETInterceptor
 
         public static IntPtr FollowRelJmp(IntPtr ptr)
         {
-            var archMode = Utils.CurrentArchitecture.ToArchitectureMode();
-
             while (true) {
-                // TODO: slow
-                var disasm = new Disassembler(ptr, 20, archMode);
-                var instr = disasm.NextInstruction();
-                if (instr.Mnemonic != ud_mnemonic_code.UD_Ijmp) {
+                var dec = new InstructionDecoder(ptr);
+                var e = dec.GetEnumerator();
+                e.MoveNext();
+                if (e.Current.Opcode != 0xE9) {
                     break;
                 }
-                Debug.Assert(instr.Operands.Length == 1);
-                ptr = ptr.Plus(instr.Operands[0].LvalSDWord + 5);
+                ptr = ptr.Plus((int)e.Current.Memory + 5);
             }
 
             return ptr;
@@ -124,13 +107,13 @@ namespace NETInterceptor
         public static IntPtr FindNearestOp(IntPtr ptr, int minOffset)
         {
             int len = 0;
-            var archMode = Utils.CurrentArchitecture.ToArchitectureMode();
-            var disasm = new Disassembler(ptr, 20, archMode);
+            var dec = new InstructionDecoder(ptr);
+            var e = dec.GetEnumerator();
 
-            while (len < minOffset) {                
-                var instr = disasm.NextInstruction();
-                len += instr.Length;
-                ptr = ptr.Plus(instr.Length);
+            while (len < minOffset) {
+                e.MoveNext();
+                len += e.Current.Length;
+                ptr = ptr.Plus(e.Current.Length);
             }
 
             return ptr;

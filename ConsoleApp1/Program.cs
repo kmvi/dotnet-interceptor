@@ -26,9 +26,7 @@ namespace ConsoleApp1
 
             m();
 
-            var p = ThePreStub.Instance.PreStubWorker;
-
-            /*var target = typeof(DirectoryInfo).GetProperty("Exists").GetGetMethod();
+            var target = typeof(DirectoryInfo).GetProperty("Exists").GetGetMethod();
             var subst = typeof(Program).GetMethod("test");
 
             var addr = new Method(target).GetCompiledCodeAddress();
@@ -37,7 +35,7 @@ namespace ConsoleApp1
             handle = Intercept.On(target, subst);
             var d = new DirectoryInfo("d:\\");
             var e = d.Exists;
-            handle.Dispose();*/
+            handle.Dispose();
 
         }
 
