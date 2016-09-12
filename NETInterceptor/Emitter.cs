@@ -63,14 +63,18 @@ namespace NETInterceptor
             var gen = cb.GetILGenerator();
             gen.Emit(OpCodes.Ret);
 
+            var attr = MethodAttributes.Public;
+            if (info.IsStatic)
+                attr |= MethodAttributes.Static;
             var methodName = "__" + Guid.NewGuid().ToString("N");
-            var mb = tb.DefineMethod(methodName, MethodAttributes.Public, info.ReturnType, info.GetParameters().Select(x => x.ParameterType).ToArray());
+            var mb = tb.DefineMethod(methodName, attr, info.ReturnType, info.GetParameters().Select(x => x.ParameterType).ToArray());
             mb.SetImplementationFlags(MethodImplAttributes.NoInlining | MethodImplAttributes.NoOptimization);
 
             gen = mb.GetILGenerator();
             for (int i = 0; i < 20; ++i)
                 gen.Emit(OpCodes.Nop);
 
+            // TODO: return ref value case
             var loc = gen.DeclareLocal(info.ReturnType);
             gen.Emit(OpCodes.Ldloc, loc);
             gen.Emit(OpCodes.Initobj, info.ReturnType);

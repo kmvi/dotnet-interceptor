@@ -24,22 +24,36 @@ namespace ConsoleApp1
             // var ptr = typeof(MarshalByRefObject).GetMethod("GetLifetimeService").MethodHandle.GetFunctionPointer();
             ////Utils.Dump(ptr, 70);
 
-            m();
+            /*            var target = typeof(DirectoryInfo).GetProperty("Exists").GetGetMethod();
+                        var subst = typeof(Program).GetMethod("test");
 
-            var target = typeof(DirectoryInfo).GetProperty("Exists").GetGetMethod();
-            var subst = typeof(Program).GetMethod("test");
-
-            var addr = new Method(target).GetCompiledCodeAddress();
+                        var addr = new Method(target).GetCompiledCodeAddress();
 
 
+                        handle = Intercept.On(target, subst);
+                        var d = new DirectoryInfo("d:\\");
+                        var e = d.Exists;
+                        handle.Dispose();*/
+
+            var target = typeof(DateTime).GetMethod("TryParse", BindingFlags.Static | BindingFlags.Public, null, new[] { typeof(string), typeof(DateTime).MakeByRefType() }, null);
+            var subst = typeof(Program).GetMethod("parse");
             handle = Intercept.On(target, subst);
-            var d = new DirectoryInfo("d:\\");
-            var e = d.Exists;
+            var r = DateTime.TryParse("2000-01-01", out var t);
             handle.Dispose();
-
         }
 
         private static HookHandle handle;
+
+        public static bool parse(string s, out DateTime d)
+        {
+            Console.WriteLine(s);
+            DateTime tmp = default(DateTime);
+            var args = new object[] { s, tmp };
+            var r = handle.InvokeTarget(null, args);
+            Console.WriteLine(args[1]);
+            d = new DateTime(2010, 2, 3);
+            return false;
+        }
 
         public bool test()
         {
