@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Linq;
 using System.Text;
 
 namespace NETInterceptor
@@ -66,8 +65,14 @@ namespace NETInterceptor
             var attr = MethodAttributes.Public;
             if (info.IsStatic)
                 attr |= MethodAttributes.Static;
+
+            var prms = info.GetParameters();
+            var prmTypes = new Type[prms.Length];
+            for (int i = 0; i < prms.Length; ++i)
+                prmTypes[i] = prms[i].ParameterType;
+
             var methodName = "__" + Guid.NewGuid().ToString("N");
-            var mb = tb.DefineMethod(methodName, attr, info.ReturnType, info.GetParameters().Select(x => x.ParameterType).ToArray());
+            var mb = tb.DefineMethod(methodName, attr, info.ReturnType, prmTypes);
             mb.SetImplementationFlags(MethodImplAttributes.NoInlining | MethodImplAttributes.NoOptimization);
 
             gen = mb.GetILGenerator();

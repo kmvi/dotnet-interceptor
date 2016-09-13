@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace NETInterceptor
@@ -66,7 +65,9 @@ namespace NETInterceptor
                         long mask = (1L << (rem * 8)) - 1L;
                         long tmp = *ptr;
                         *ptr = (code & mask) | (tmp & ~mask);
-                        oldCode.Append(BitConverter.GetBytes(tmp).Take(rem));
+                        var bytes = BitConverter.GetBytes(tmp);
+                        for (int j = 0; j < rem; ++j)
+                            oldCode.Append(bytes[j]);
                     } else {
                         oldCode.AppendLong(*ptr);
                         *ptr = code;
@@ -78,13 +79,11 @@ namespace NETInterceptor
 
         private static long GetInt64(IList<byte> bytes, int offset)
         {
-            byte[] a = bytes.Skip(offset).Take(8).ToArray();
+            var result = new byte[8];
+            for (int i = offset; i < Math.Min(8 + offset, bytes.Count); ++i)
+                result[i - offset] = bytes[i];
 
-            if (a.Length < 8) {
-                a = Utils.ConcatArray(a, new byte[8 - a.Length]);
-            }
-
-            return BitConverter.ToInt64(a, 0);
+            return BitConverter.ToInt64(result, 0);
         }
     }
 }
