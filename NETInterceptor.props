@@ -59,6 +59,17 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+  
+  <!-- References -->
+  
+  <ItemGroup Condition="'$(Configuration)' == 'Net40Release' or '$(Configuration)' == 'Net40Debug'">
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+  </ItemGroup>
+  
+  <ItemGroup Condition="'$(Configuration)' == 'Net35Release' or '$(Configuration)' == 'Net35Debug'">
+    <Reference Include="System" />
+  </ItemGroup>
 
   <Target Name="NETInterceptor">
     
