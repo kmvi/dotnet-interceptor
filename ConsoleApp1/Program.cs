@@ -16,32 +16,9 @@ namespace ConsoleApp1
         [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
         static unsafe void Main(string[] args)
         {
-
-            //var ptr = new Func<String>(test).Method.MethodHandle.GetFunctionPointer();
-            //var ptr = typeof(Program).GetMethod("Shim", BindingFlags.Static | BindingFlags.Public).MethodHandle;
-            //var ptr = typeof(Action).GetMethod("BeginInvoke").MethodHandle.GetFunctionPointer();
-            // var ptr = typeof(MarshalByRefObject).GetMethod("GetLifetimeService").MethodHandle.GetFunctionPointer();
-            ////Utils.Dump(ptr, 70);
-
-            /*            var target = typeof(DirectoryInfo).GetProperty("Exists").GetGetMethod();
-                        var subst = typeof(Program).GetMethod("test");
-
-                        var addr = new Method(target).GetCompiledCodeAddress();
-
-
-                        handle = Intercept.On(target, subst);
-                        var d = new DirectoryInfo("d:\\");
-                        var e = d.Exists;
-                        handle.Dispose();*/
-
-            var k = ThePreStub.Instance.PreStubWorkerAddress;
-
-            /*var target = typeof(DateTime).GetMethod("TryParse", BindingFlags.Static | BindingFlags.Public, null, new[] { typeof(string), typeof(DateTime).MakeByRefType() }, null);
-            var subst = typeof(Program).GetMethod("parse");
-            handle = Intercept.On(target, subst);
-            DateTime t;
-            var r = DateTime.TryParse("2000-01-01", out t);
-            handle.Dispose();*/
+            StaticMethodsExample.Demo();
+            //InstancePropertyGetterExample.Demo();
+            //InstancePropertySetterExample.Demo();
         }
 
         private static HookHandle handle;

@@ -14,6 +14,10 @@
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="StaticMethodsExample.cs" />
+    <Compile Include="InstanceMethodsExample.cs" />
+    <Compile Include="InstancePropertyGetterExample.cs" />
+    <Compile Include="InstancePropertySetterExample.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
