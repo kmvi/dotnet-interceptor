@@ -604,6 +604,7 @@ namespace NETInterceptor
                         case 0xC0:
                         case 0xC1:
                         case 0x7F:
+                        case 0x1F:
                             hasModRM = true;
                             break;
                         case 0x06:
