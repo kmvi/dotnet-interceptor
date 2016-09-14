@@ -42,6 +42,7 @@ namespace NETInterceptor
             if (_injected)
                 throw new InvalidOperationException();
 
+            // TODO: atomic substitute
             if (CanMakeRelativeJump(_target, _subst)) {
                 const int jmpSize = 5;
 
@@ -50,17 +51,18 @@ namespace NETInterceptor
                 _size = (int)(ptr.ToInt64() - _target.ToInt64());
                 Debug.Assert(_size <= 16);
 
+                _oldCode = CodeBlock.FromPtr(_target, _size);
+                var reJmp = new CodeBlock(_oldCode);
+                reJmp.Append(0xE9);
+                reJmp.AppendInt(GetRelativeJumpDistance(_relocated, _target));
+                reJmp.WriteTo(_relocated);
+
                 var jmp = new CodeBlock();
                 jmp.Append(0xE9);
                 jmp.AppendInt(jmpDistance);
                 jmp.Append(Enumerable.Repeat<byte>(0x90, _size - jmpSize));
                 Debug.Assert(jmp.Length == _size);
-                _oldCode = jmp.WriteTo(_target);
-
-                var reJmp = new CodeBlock(_oldCode);
-                reJmp.Append(0xE9);
-                reJmp.AppendInt(GetRelativeJumpDistance(_relocated, _target));
-                reJmp.WriteTo(_relocated);
+                jmp.WriteTo(_target);
             } else {
                 // TODO: absolute jmp to subst code
                 throw new NotImplementedException();

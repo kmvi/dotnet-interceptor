@@ -77,6 +77,29 @@ namespace NETInterceptor
             }
         }
 
+        public static unsafe CodeBlock FromPtr(IntPtr target, int count)
+        {
+            if (target == IntPtr.Zero)
+                throw new ArgumentException();
+
+            if (count <= 0)
+                throw new ArgumentException();
+
+            var code = new CodeBlock();
+            var ptr = (long*)target.ToPointer();
+            for (int i = 0; i < count; i += 8, ++ptr) {
+                var rem = count - i;
+                if (rem < 8) {
+                    var bytes = BitConverter.GetBytes(*ptr);
+                    for (int j = 0; j < rem; ++j)
+                        code.Append(bytes[j]);
+                } else {
+                    code.AppendLong(*ptr);
+                }
+            }
+            return code;
+        }
+
         private static long GetInt64(IList<byte> bytes, int offset)
         {
             var result = new byte[8];
