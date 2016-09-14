@@ -9,6 +9,9 @@ namespace NETInterceptor
 {
     public abstract class ThePreStub
     {
+        private delegate IntPtr PreStubWorker_CLR46(IntPtr pTransitionBlock, IntPtr pMD);
+        private delegate IntPtr PreStubWorker_Legacy(IntPtr pPFrame);
+
         private static readonly Lazy<ThePreStub> _instance = new Lazy<ThePreStub>(Create);
         private readonly IntPtr _preStubPtr;
 
@@ -26,6 +29,25 @@ namespace NETInterceptor
 
         public abstract IntPtr PreStubWorkerAddress { get; }
 
+        public virtual IntPtr InvokePreStubWorker(IntPtr arg1, IntPtr arg2)
+        {
+            if (Env.CurrentRuntime == Runtime.CLR2 || Env.CurrentRuntime == Runtime.CLR4) {
+                // arg1 is (PrestubMethodFrame *pPFrame)
+                // arg2 not used
+                var dlg = (PreStubWorker_Legacy)Marshal.GetDelegateForFunctionPointer(
+                    PreStubWorkerAddress, typeof(PreStubWorker_Legacy));
+                return dlg(arg1);
+            } else if (Env.CurrentRuntime >= Runtime.CLR46) {
+                // arg1 is (TransitionBlock* pTransitionBlock)
+                // arg2 is (MethodDesc* pMD)
+                var dlg = (PreStubWorker_CLR46)Marshal.GetDelegateForFunctionPointer(
+                    PreStubWorkerAddress, typeof(PreStubWorker_CLR46));
+                return dlg(arg1, arg2);
+            }
+
+            throw new NotSupportedException("Unsupported runtime.");
+        }
+
         private static ThePreStub Create()
         {
             IntPtr precodePtr = Precode.DetectPrecode.GetPrecodePtr();
@@ -40,7 +62,6 @@ namespace NETInterceptor
                     throw new NotSupportedException("Unsupported architecture.");
             }
         }
-
         
         private unsafe class ThePreStubX86 : ThePreStub
         {
