@@ -14,7 +14,7 @@ namespace NETInterceptor
 
         public new static RemotingPrecode Create(IntPtr methodPtr)
         {
-            switch (Utils.CurrentArchitecture) {
+            switch (Env.CurrentArchitecture) {
                 case Architecture.X86:
                     return new RemotingPrecodeX86(methodPtr);
                 case Architecture.X64:
@@ -26,7 +26,7 @@ namespace NETInterceptor
 
         public static bool IsRemotingPrecode(IntPtr methodPtr)
         {
-            switch (Utils.CurrentArchitecture) {
+            switch (Env.CurrentArchitecture) {
                 case Architecture.X86:
                     return RemotingPrecodeX86.IsRemotingPrecode(methodPtr);
                 case Architecture.X64:

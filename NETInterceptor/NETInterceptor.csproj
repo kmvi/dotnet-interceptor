@@ -8,13 +8,14 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>NETInterceptor</RootNamespace>
     <AssemblyName>NETInterceptor</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="CodeBlock.cs" />
     <Compile Include="CodeInject.cs" />
     <Compile Include="Emitter.cs" />
+    <Compile Include="Env.cs" />
     <Compile Include="FixupPrecode.cs" />
     <Compile Include="HookHandle.cs" />
     <Compile Include="InstructionDecoder.cs" />

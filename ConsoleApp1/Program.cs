@@ -34,11 +34,14 @@ namespace ConsoleApp1
                         var e = d.Exists;
                         handle.Dispose();*/
 
-            var target = typeof(DateTime).GetMethod("TryParse", BindingFlags.Static | BindingFlags.Public, null, new[] { typeof(string), typeof(DateTime).MakeByRefType() }, null);
+            var k = ThePreStub.Instance.PreStubWorkerAddress;
+
+            /*var target = typeof(DateTime).GetMethod("TryParse", BindingFlags.Static | BindingFlags.Public, null, new[] { typeof(string), typeof(DateTime).MakeByRefType() }, null);
             var subst = typeof(Program).GetMethod("parse");
             handle = Intercept.On(target, subst);
-            var r = DateTime.TryParse("2000-01-01", out var t);
-            handle.Dispose();
+            DateTime t;
+            var r = DateTime.TryParse("2000-01-01", out t);
+            handle.Dispose();*/
         }
 
         private static HookHandle handle;

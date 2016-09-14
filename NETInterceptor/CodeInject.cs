@@ -100,7 +100,7 @@ namespace NETInterceptor
 
         public static CodeInject Create(IntPtr pCompiledTarget, IntPtr pCompiledDest, IntPtr pRelocated)
         {
-            switch (Utils.CurrentArchitecture) {
+            switch (Env.CurrentArchitecture) {
                 case Architecture.X86:
                     return new CodeInjectX86(pCompiledTarget, pCompiledDest, pRelocated);
                 case Architecture.X64:

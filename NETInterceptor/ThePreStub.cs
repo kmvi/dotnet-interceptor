@@ -31,7 +31,7 @@ namespace NETInterceptor
             IntPtr precodePtr = Precode.DetectPrecode.GetPrecodePtr();
             Precode precode = Precode.Create(precodePtr);
 
-            switch (Utils.CurrentArchitecture) {
+            switch (Env.CurrentArchitecture) {
                 case Architecture.X86:
                     return new ThePreStubX86(precode.TargetPtr);
                 case Architecture.X64:
@@ -97,7 +97,7 @@ namespace NETInterceptor
             {
                 get {
                     var ptr = Address.ToBytePtr();
-                    if (Utils.CurrentRuntime == Runtime.CLR2) {
+                    if (Env.CurrentRuntime == Runtime.CLR2) {
                         #region listing
                         /*
                            0:   48 8d 44 24 08          lea    rax,[rsp+0x8]
@@ -170,11 +170,11 @@ namespace NETInterceptor
                         return new IntPtr(Utils.JmpOrCallDest(ptr));
                     }
 
-                    if (Utils.CurrentRuntime == Runtime.CLR4) {
+                    if (Env.CurrentRuntime == Runtime.CLR4) {
                         throw new NotImplementedException();
                     }
 
-                    if (Utils.CurrentRuntime == Runtime.CLR46) {
+                    if (Env.CurrentRuntime == Runtime.CLR46) {
                         #region listing
                         /*
                         0:   41 57                   push   r15
@@ -229,7 +229,7 @@ namespace NETInterceptor
                         #endregion
 
                         Debug.Assert(*(ulong*)ptr == 0x5441554156415741UL);
-                        ptr += 0xC;
+                        ptr += 0x50;
                         return new IntPtr(Utils.JmpOrCallDest(ptr));
                     }
 

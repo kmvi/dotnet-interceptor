@@ -42,7 +42,7 @@ namespace NETInterceptor
 
         public IEnumerator<Instruction> GetEnumerator()
         {
-            switch (Utils.CurrentArchitecture) {
+            switch (Env.CurrentArchitecture) {
                 case Architecture.X64:
                     return new InstructionLengthEnumerator64(new ByteEnumerator(_code.GetEnumerator()));
                 case Architecture.X86:

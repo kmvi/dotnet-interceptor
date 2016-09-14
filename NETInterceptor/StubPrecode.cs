@@ -13,7 +13,7 @@ namespace NETInterceptor
 
         public new static StubPrecode Create(IntPtr methodPtr)
         {
-            switch (Utils.CurrentArchitecture) {
+            switch (Env.CurrentArchitecture) {
                 case Architecture.X86:
                     return new StubPrecodeX86(methodPtr);
                 case Architecture.X64:
@@ -25,7 +25,7 @@ namespace NETInterceptor
 
         public static bool IsStubPrecode(IntPtr methodPtr)
         {
-            switch (Utils.CurrentArchitecture) {
+            switch (Env.CurrentArchitecture) {
                 case Architecture.X86:
                     return StubPrecodeX86.IsStubPrecode(methodPtr);
                 case Architecture.X64:

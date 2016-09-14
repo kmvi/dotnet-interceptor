@@ -22,7 +22,7 @@ namespace NETInterceptor
 
         public new static FixupPrecode Create(IntPtr methodPtr)
         {
-            switch (Utils.CurrentArchitecture) {
+            switch (Env.CurrentArchitecture) {
                 case Architecture.X86:
                     return new FixupPrecodeX86(methodPtr);
                 case Architecture.X64:
@@ -134,7 +134,7 @@ namespace NETInterceptor
 
             protected override byte* GetThePreStubPtr(byte* precodeFixupThunkPtr)
             {
-                if (Utils.CurrentRuntime == Runtime.CLR2) {
+                if (Env.CurrentRuntime == Runtime.CLR2) {
                     /*
                      0:   58                      pop    eax
                      1:   56                      push   esi
@@ -156,7 +156,7 @@ namespace NETInterceptor
                     return *g_dwPreStubAddr;
                 }
                 
-                if (Utils.CurrentRuntime >= Runtime.CLR4) {
+                if (Env.CurrentRuntime >= Runtime.CLR4) {
                     /*
                        0:   58                      pop    eax
                        1:   56                      push   esi
