@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Text;
 
 namespace NETInterceptor
@@ -60,7 +59,8 @@ namespace NETInterceptor
                 var jmp = new CodeBlock();
                 jmp.Append(0xE9);
                 jmp.AppendInt(jmpDistance);
-                jmp.Append(Enumerable.Repeat<byte>(0x90, _size - jmpSize));
+                for (int i = 0; i < _size - jmpSize; ++i)
+                    jmp.Append(0x90);
                 Debug.Assert(jmp.Length == _size);
                 jmp.WriteTo(_target);
             } else {

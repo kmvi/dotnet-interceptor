@@ -17,8 +17,8 @@ namespace ConsoleApp1
         static unsafe void Main(string[] args)
         {
             StaticMethodsExample.Demo();
-            //InstancePropertyGetterExample.Demo();
-            //InstancePropertySetterExample.Demo();
+            InstancePropertyGetterExample.Demo();
+            InstancePropertySetterExample.Demo();
         }
 
         private static HookHandle handle;
