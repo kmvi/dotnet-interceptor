@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
+using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using System.Text;
 
@@ -9,6 +10,12 @@ namespace NETInterceptor
 {
     public class Method
     {
+        private static readonly Type _dynamicMethod = typeof(DynamicMethod);
+        private static readonly Type _rtDynamicMethod = _dynamicMethod.GetNestedType("RTDynamicMethod", BindingFlags.NonPublic);
+        private static readonly FieldInfo _ownerField = _rtDynamicMethod.GetField("m_owner", BindingFlags.NonPublic | BindingFlags.Instance);
+        private static readonly FieldInfo _methodField = _dynamicMethod.GetField("m_method", BindingFlags.NonPublic | BindingFlags.Instance);
+        private static readonly MethodInfo _getMethodDescriptorMethod = _dynamicMethod.GetMethod("GetMethodDescriptor", BindingFlags.NonPublic | BindingFlags.Instance);
+
         private readonly MethodBase _method;
         private Precode _precode;
 
@@ -22,7 +29,17 @@ namespace NETInterceptor
 
         public IntPtr Address
         {
-            get { return _method.MethodHandle.GetFunctionPointer(); }
+            get {
+                // TODO: create classes
+                if (_method.GetType() == _dynamicMethod) {
+                    return GetDynamicMethodRuntimeHandle(_method).GetFunctionPointer();
+                }
+                if (_method.GetType() == _rtDynamicMethod) {
+                    var owner = (DynamicMethod)_ownerField.GetValue(_method);
+                    return GetDynamicMethodRuntimeHandle(owner).GetFunctionPointer();
+                }
+                return _method.MethodHandle.GetFunctionPointer();
+            }
         }
 
         public bool HasPrecode
@@ -107,5 +124,16 @@ namespace NETInterceptor
 
             return _precode;
         }
+
+        private static RuntimeMethodHandle GetDynamicMethodRuntimeHandle(MethodBase method)
+        {
+            if (Env.CurrentRuntime == Runtime.CLR2) {
+                return ((RuntimeMethodHandle)_methodField.GetValue(method));
+            } else if (Env.CurrentRuntime >= Runtime.CLR4) {
+                return (RuntimeMethodHandle)_getMethodDescriptorMethod.Invoke(method, null);
+            }
+
+            throw new NotSupportedException("Unsupported runtime.");
+        } 
     }
 }
