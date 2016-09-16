@@ -32,11 +32,11 @@ namespace NETInterceptor
             var reloc = Emitter.EmitMethod((MethodInfo)target);
             var relocMethod = new Method(reloc);
 
-            var inject = CodeInject.Create(
-                targetMethod.GetCompiledCodeAddress(),
-                destMethod.GetCompiledCodeAddress(),
-                relocMethod.GetCompiledCodeAddress());
+            var targetAddr = targetMethod.GetCompiledCodeAddress();
+            var destAddr = destMethod.GetCompiledCodeAddress();
+            var relocAddr = relocMethod.GetCompiledCodeAddress();
 
+            var inject = CodeInject.Create(targetAddr, destAddr, relocAddr);
             inject.Inject();
 
             return new HookHandle(target, reloc, inject);

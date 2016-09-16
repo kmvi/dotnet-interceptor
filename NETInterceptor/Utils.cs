@@ -54,7 +54,8 @@ namespace NETInterceptor
                 if (e.Current.Opcode != 0xE9) {
                     break;
                 }
-                ptr = ptr.Plus((int)e.Current.Memory + 5);
+                Debug.Assert(e.Current.Data != 0);
+                ptr = ptr.Plus((int)e.Current.Data + 5);
             }
 
             return ptr;
