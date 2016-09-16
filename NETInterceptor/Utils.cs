@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace NETInterceptor
@@ -140,6 +141,25 @@ namespace NETInterceptor
         {
             return new IntPtr(ptr.ToBytePtr() + offset);
 
+        }
+
+        public static int SizeOf(Type t)
+        {
+            if (t == null)
+                throw new ArgumentNullException("t");
+
+            if (!t.IsValueType)
+                throw new ArgumentException();
+
+            var wrapper = typeof(SizeOfWrapper<>).MakeGenericType(t);
+            var inst = Activator.CreateInstance(wrapper);
+
+            return Marshal.SizeOf(inst);
+        }
+
+        private struct SizeOfWrapper<T>
+        {
+            private T _field;
         }
 
         private const BindingFlags NonPublicInst = BindingFlags.NonPublic | BindingFlags.Instance;

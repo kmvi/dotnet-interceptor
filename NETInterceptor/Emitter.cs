@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace NETInterceptor
@@ -20,14 +21,30 @@ namespace NETInterceptor
 
         private static MethodInfo EmitMethodInternal(MethodInfo info)
         {
-            var tb = _builder.Value.DefineType("__" + Guid.NewGuid().ToString("N"),
-                            TypeAttributes.Class | TypeAttributes.Public |
-                            TypeAttributes.AnsiClass | TypeAttributes.AutoClass);
+            Type parent;
+            var attr = TypeAttributes.Public | TypeAttributes.AnsiClass | TypeAttributes.Sealed;
+            if (info.DeclaringType.IsValueType) {
+                attr |= TypeAttributes.Serializable;
+                parent = typeof(ValueType);
+            } else {
+                attr |= TypeAttributes.Class;
+                parent = typeof(object);
+            }
+
+            var tb = _builder.Value.DefineType("__" + Guid.NewGuid().ToString("N"), attr, parent);
+
+            if (info.DeclaringType.IsValueType) {
+                var size = Utils.SizeOf(info.DeclaringType);
+                for (int i = 0; i < size; ++i) {
+                    tb.DefineField("_f" + i, typeof(byte), FieldAttributes.Private);
+                }
+            }
 
             EmitCtor(tb);
             var methodName = EmitMethod(info, tb);
+            var type = tb.CreateType();
 
-            return tb.CreateType().GetMethod(methodName);
+            return type.GetMethod(methodName);
         }
 
         private static string EmitMethod(MethodInfo info, TypeBuilder tb)
