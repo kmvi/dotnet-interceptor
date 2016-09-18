@@ -14,11 +14,12 @@ namespace NETInterceptor
             if (length <= 0)
                 throw new ArgumentException("Length should be greater than zero.", "length");
 
+            var sb = new StringBuilder(length);
             while (length-- > 0) {
-                Debug.Write((*ptr++).ToString("X2"));
+                sb.Append((*ptr++).ToString("X2"));
             }
 
-            Debug.WriteLine(String.Empty);
+            Debug.WriteLine(sb.ToString());
         }
 
         internal static unsafe void Dump(IntPtr ptr, int length)
