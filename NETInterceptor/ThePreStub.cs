@@ -74,35 +74,90 @@ namespace NETInterceptor
             {
                 get
                 {
-                    #region listing
-                    /*  
-                        ThePreStub code:
-                        0:   55                      push   ebp
-                        1:   8b ec                   mov    ebp,esp
-                        3:   53                      push   ebx
-                        4:   56                      push   esi
-                        5:   57                      push   edi
-                        6:   51                      push   ecx
-                        7:   52                      push   edx
-                        8:   8b f4                   mov    esi,esp
-                        a:   50                      push   eax
-                        b:   56                      push   esi
-                        c:   e8 ac 62 0b 00          call   0xb62bd ; PreStubWorker
-                        11:   5a                      pop    edx
-                        12:   59                      pop    ecx
-                        13:   5f                      pop    edi
-                        14:   5e                      pop    esi
-                        15:   5b                      pop    ebx
-                        16:   5d                      pop    ebp
-                        17:   ff e0                   jmp    eax
-                        19:   c3                      ret
-                    */
-                    #endregion
+                    // TODO: check clr4 with updates
+                    if (Env.CurrentRuntime == Runtime.CLR2 || Env.CurrentRuntime == Runtime.CLR4) {
+                        #region listing
+                        /*
+                             0:   50                      push   eax
+                             1:   52                      push   edx
+                             2:   68 20 37 14 79          push   0x79143720
+                             7:   55                      push   ebp
+                             8:   53                      push   ebx
+                             9:   56                      push   esi
+                             a:   57                      push   edi
+                             b:   8d 74 24 10             lea    esi,[esp+0x10]
+                             f:   ff 76 0c                push   DWORD PTR [esi+0xc]
+                            12:   55                      push   ebp
+                            13:   89 e5                   mov    ebp,esp
+                            15:   51                      push   ecx
+                            16:   52                      push   edx
+                            17:   64 8b 1d 44 0e 00 00    mov    ebx,DWORD PTR fs:0xe44
+                            1e:   8b 7b 0c                mov    edi,DWORD PTR [ebx+0xc]
+                            21:   89 7e 04                mov    DWORD PTR [esi+0x4],edi
+                            24:   89 73 0c                mov    DWORD PTR [ebx+0xc],esi
+                            27:   68 fc e0 3d 2d          push   0x2d3de0fc
+                            2c:   56                      push   esi
+                            2d:   e8 83 ff 82 78          call   0x7882ffb5 ; <----- PreStubWorker
+                            32:   89 7b 0c                mov    DWORD PTR [ebx+0xc],edi
+                            35:   8b 4e 08                mov    ecx,DWORD PTR [esi+0x8]
+                            38:   89 46 08                mov    DWORD PTR [esi+0x8],eax
+                            3b:   8b c1                   mov    eax,ecx
+                            3d:   83 c4 04                add    esp,0x4
+                            40:   5a                      pop    edx
+                            41:   59                      pop    ecx
+                            42:   89 ec                   mov    esp,ebp
+                            44:   5d                      pop    ebp
+                            45:   83 c4 04                add    esp,0x4
+                            48:   5f                      pop    edi
+                            49:   5e                      pop    esi
+                            4a:   5b                      pop    ebx
+                            4b:   5d                      pop    ebp
+                            4c:   83 c4 08                add    esp,0x8
+                            4f:   c3                      ret
+                        */
+                        #endregion
 
-                    var ptr = Address.ToBytePtr();
-                    Debug.Assert(*(ulong*)ptr == 0x5251575653EC8B55UL);
-                    ptr += 0xC;
-                    return new IntPtr(Utils.JmpOrCallDest(ptr));
+                        var ptr = Address.ToBytePtr();
+                        Debug.Assert(((*(ulong*)ptr) & 0xFF00000000FFFFFFUL) == 0x5500000000685250UL);
+                        ptr += 0x2D;
+                        Debug.Assert(*ptr == 0xE8);
+                        return new IntPtr(Utils.JmpOrCallDest(ptr));
+                    }
+
+                    if (Env.CurrentRuntime >= Runtime.CLR46) {
+                        #region listing
+                        /*  
+                            ThePreStub code:
+                            0:   55                      push   ebp
+                            1:   8b ec                   mov    ebp,esp
+                            3:   53                      push   ebx
+                            4:   56                      push   esi
+                            5:   57                      push   edi
+                            6:   51                      push   ecx
+                            7:   52                      push   edx
+                            8:   8b f4                   mov    esi,esp
+                            a:   50                      push   eax
+                            b:   56                      push   esi
+                            c:   e8 ac 62 0b 00          call   0xb62bd ; PreStubWorker
+                            11:   5a                      pop    edx
+                            12:   59                      pop    ecx
+                            13:   5f                      pop    edi
+                            14:   5e                      pop    esi
+                            15:   5b                      pop    ebx
+                            16:   5d                      pop    ebp
+                            17:   ff e0                   jmp    eax
+                            19:   c3                      ret
+                        */
+                        #endregion
+
+                        var ptr = Address.ToBytePtr();
+                        Debug.Assert(*(ulong*)ptr == 0x5251575653EC8B55UL);
+                        ptr += 0xC;
+                        Debug.Assert(*ptr == 0xE8);
+                        return new IntPtr(Utils.JmpOrCallDest(ptr));
+                    }
+
+                    throw new NotSupportedException("Unsupported runtime.");
                 }
             }
         }

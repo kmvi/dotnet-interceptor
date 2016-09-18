@@ -106,9 +106,10 @@ namespace NETInterceptor
                 prms[i] = args[i];
 
             object result;
-            if (Env.CurrentRuntime == Runtime.CLR2) {                
+            
+            if (Env.CurrentRuntime == Runtime.CLR2) {
                 var owner = new RuntimeTypeHandle();
-                
+
                 if (!(bool)_isGlobalProperty.GetValue(_cacheField.GetValue(@this), null))
                     owner = ((Type)_declTypeField.GetValue(@this)).TypeHandle;
 
@@ -120,7 +121,22 @@ namespace NETInterceptor
                     prms = (object[])_checkArgsMethod.Invoke(@this, a);
                     result = _invokeMethodFast.Invoke(@this.MethodHandle, new object[] { value, prms, signature, attr, owner });
                 }
-            } else if (Env.CurrentRuntime >= Runtime.CLR4) {
+            } else if (Env.CurrentRuntime == Runtime.CLR4) {
+                // TODO: check clr4 with updates
+                object owner = null;
+
+                if (!(bool)_isGlobalProperty.GetValue(_cacheField.GetValue(@this), null))
+                    owner = _declTypeField.GetValue(@this);
+
+                object attr = _methodAttrField.GetValue(@this);
+                if (paramsCount == 0) {
+                    result = _invokeMethodFastStatic.Invoke(null, new object[] { @this, value, null, signature, attr, owner });
+                } else {
+                    var a = new object[] { args, null, BindingFlags.Default, null, signature };
+                    prms = (object[])_checkArgsMethod.Invoke(@this, a);
+                    result = _invokeMethodFastStatic.Invoke(null, new object[] { @this, value, prms, signature, attr, owner });
+                }
+            } else if (Env.CurrentRuntime >= Runtime.CLR46) {
                 if (paramsCount == 0)
                     result = _invokeMethod.Invoke(null, new object[] { value, null, signature, false });
                 else {
@@ -175,6 +191,7 @@ namespace NETInterceptor
         private static readonly Type _rmhType = typeof(RuntimeMethodHandle);
         private static readonly FieldInfo _methodAttrField = _rmiType.GetField("m_methodAttributes", BindingFlags.Instance | BindingFlags.NonPublic);
         private static readonly MethodInfo _invokeMethodFast = _rmhType.GetMethod("InvokeMethodFast", BindingFlags.Instance | BindingFlags.NonPublic);
+        private static readonly MethodInfo _invokeMethodFastStatic = _rmhType.GetMethod("InvokeMethodFast", BindingFlags.Static | BindingFlags.NonPublic);
         private static readonly MethodInfo _invokeMethod = _rmhType.GetMethod("InvokeMethod", BindingFlags.Static | BindingFlags.NonPublic);
     }
 }

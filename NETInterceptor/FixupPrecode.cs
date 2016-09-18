@@ -134,7 +134,8 @@ namespace NETInterceptor
 
             protected override byte* GetThePreStubPtr(byte* precodeFixupThunkPtr)
             {
-                if (Env.CurrentRuntime == Runtime.CLR2) {
+                // TODO: check clr4 with updates
+                if (Env.CurrentRuntime == Runtime.CLR2 || Env.CurrentRuntime == Runtime.CLR4) {
                     /*
                      0:   58                      pop    eax
                      1:   56                      push   esi
@@ -156,7 +157,7 @@ namespace NETInterceptor
                     return *g_dwPreStubAddr;
                 }
                 
-                if (Env.CurrentRuntime >= Runtime.CLR4) {
+                if (Env.CurrentRuntime >= Runtime.CLR46) {
                     /*
                        0:   58                      pop    eax
                        1:   56                      push   esi
