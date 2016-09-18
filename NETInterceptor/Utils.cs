@@ -159,7 +159,9 @@ namespace NETInterceptor
 
         private struct SizeOfWrapper<T>
         {
+            #pragma warning disable CS0169
             private T _field;
+            #pragma warning restore CS0169
         }
 
         private const BindingFlags NonPublicInst = BindingFlags.NonPublic | BindingFlags.Instance;

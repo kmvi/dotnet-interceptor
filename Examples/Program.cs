@@ -9,7 +9,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace ConsoleApp1
+namespace Examples
 {
     class Program
     {
@@ -17,6 +17,7 @@ namespace ConsoleApp1
         static unsafe void Main(string[] args)
         {
             StaticMethodsExample.Demo();
+            InstanceMethodsExample.Demo();
             InstancePropertyGetterExample.Demo();
             InstancePropertySetterExample.Demo();
         }
