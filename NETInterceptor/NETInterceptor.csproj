@@ -29,6 +29,7 @@
     <Compile Include="RemotingPrecode.cs" />
     <Compile Include="StubPrecode.cs" />
     <Compile Include="ThePreStub.cs" />
+    <Compile Include="UnsafeInvoke.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="WritableMemoryBlock.cs" />
   </ItemGroup>

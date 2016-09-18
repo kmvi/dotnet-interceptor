@@ -11,10 +11,10 @@ namespace Examples
     {
         private static HookHandle _handle;
 
-        #pragma warning disable CS0169
+        #pragma warning disable 169
         // struct size should be equal to sizeof(DateTime)
         private ulong _f;
-        #pragma warning restore CS0169
+        #pragma warning restore 169
 
         public static void Demo()
         {
