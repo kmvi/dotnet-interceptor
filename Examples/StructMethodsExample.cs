@@ -7,27 +7,36 @@ using System.Text;
 
 namespace Examples
 {
-    struct InstanceMethodsExample
+    struct StructMethodsExample
     {
         private static HookHandle _handle;
 
+        #pragma warning disable CS0169
+        // struct size should be equal to sizeof(DateTime)
         private ulong _f;
+        #pragma warning restore CS0169
 
         public static void Demo()
         {
             var target = typeof(DateTime).GetMethod("ToShortDateString");
-            var subst = typeof(InstanceMethodsExample).GetMethod("ToShortDateString_Subst");
+            var subst = typeof(StructMethodsExample).GetMethod("ToShortDateString_Subst");
 
             using (_handle = Intercept.On(target, subst)) {
                 var date = DateTime.Now;
                 var str = date.ToShortDateString();
+                Console.WriteLine("Replaced result: " + str);
+                Console.WriteLine();
             }
         }
 
         public string ToShortDateString_Subst()
         {
+            Console.WriteLine("--- Struct methods interception --- ");
+            Console.WriteLine("--- DateTime.ToShortDateString ---");
+            Console.Write("Calling original method... ");
             var result = (string)_handle.InvokeTarget(this, null);
-            return "";
+            Console.WriteLine("result: " + result);
+            return "Current date is: " + result;
         }
     }
 }

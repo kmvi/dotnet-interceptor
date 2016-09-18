@@ -15,7 +15,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="StaticMethodsExample.cs" />
-    <Compile Include="InstanceMethodsExample.cs" />
+    <Compile Include="StructMethodsExample.cs" />
     <Compile Include="InstancePropertyGetterExample.cs" />
     <Compile Include="InstancePropertySetterExample.cs" />
     <Compile Include="Program.cs" />

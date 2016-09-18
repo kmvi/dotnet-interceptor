@@ -13,40 +13,12 @@ namespace Examples
 {
     class Program
     {
-        [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
-        static unsafe void Main(string[] args)
+        static void Main(string[] args)
         {
             StaticMethodsExample.Demo();
-            InstanceMethodsExample.Demo();
+            StructMethodsExample.Demo();
             InstancePropertyGetterExample.Demo();
             InstancePropertySetterExample.Demo();
         }
-
-        private static HookHandle handle;
-
-        public static bool parse(string s, out DateTime d)
-        {
-            Console.WriteLine(s);
-            DateTime tmp = default(DateTime);
-            var args = new object[] { s, tmp };
-            var r = handle.InvokeTarget(null, args);
-            Console.WriteLine(args[1]);
-            d = new DateTime(2010, 2, 3);
-            return false;
-        }
-
-        public bool test()
-        {
-            var r = (bool)handle.InvokeTarget(this);
-            Console.WriteLine("tset");
-            return r;
-        }
-
-        public static void m()
-        {
-            Console.WriteLine("hello");
-        }
     }
-
-
 }
