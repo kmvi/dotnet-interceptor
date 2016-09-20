@@ -2,9 +2,25 @@
 using System.Collections.Generic;
 using System.Text;
 
+#if NET20
+
+namespace System
+{
+    public delegate T Func<T>();
+}
+
+namespace System.Runtime.CompilerServices
+{
+    [AttributeUsage(AttributeTargets.Assembly | AttributeTargets.Class | AttributeTargets.Method)]
+    public sealed class ExtensionAttribute : Attribute { }
+}
+
+#endif
+
+#if NET35 || NET20
+
 namespace NETInterceptor
 {
-#if NET35
     // TODO: we need something better
     public class Lazy<T>
     {
@@ -46,5 +62,5 @@ namespace NETInterceptor
             public T value;
         }
     }
-#endif
 }
+#endif

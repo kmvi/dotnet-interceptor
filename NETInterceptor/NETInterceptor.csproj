@@ -8,7 +8,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>NETInterceptor</RootNamespace>
     <AssemblyName>NETInterceptor</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <ItemGroup>
@@ -21,7 +21,7 @@
     <Compile Include="InstructionDecoder.cs" />
     <Compile Include="Intercept.cs" />
     <Compile Include="GlobalMemoryBlock.cs" />
-    <Compile Include="Lazy.cs" />
+    <Compile Include="Backports.cs" />
     <Compile Include="MemoryBlock.cs" />
     <Compile Include="Method.cs" />
     <Compile Include="Precode.cs" />

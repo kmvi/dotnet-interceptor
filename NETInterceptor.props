@@ -13,6 +13,11 @@
   
   <!-- Framework targets -->
   
+  <PropertyGroup Condition=" '$(Configuration)' == 'Net20Debug' Or '$(Configuration)' == 'Net20Release' ">
+    <OutputPath>$(SolutionDir)Bin\Net20\</OutputPath>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+  </PropertyGroup>
+  
   <PropertyGroup Condition=" '$(Configuration)' == 'Net35Debug' Or '$(Configuration)' == 'Net35Release' ">
     <OutputPath>$(SolutionDir)Bin\Net35\</OutputPath>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
@@ -31,17 +36,15 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <DefineConstants>DEBUG;TRACE;NET40Plus</DefineConstants>
+    <DefineConstants>DEBUG;TRACE;NET40</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Net40Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <DefineConstants>TRACE;NET40Plus</DefineConstants>
+    <DefineConstants>TRACE;NET40</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Net35Debug|AnyCPU'">
@@ -49,7 +52,6 @@
     <DefineConstants>DEBUG;TRACE;NET35</DefineConstants>
     <DebugType>full</DebugType>
     <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Net35Release|AnyCPU'">
@@ -57,17 +59,30 @@
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Net20Debug|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineConstants>DEBUG;TRACE;NET20</DefineConstants>
+    <DebugType>full</DebugType>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Net20Release|AnyCPU'">
+    <DefineConstants>TRACE;NET20</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   
   <!-- References -->
   
-  <ItemGroup Condition="'$(Configuration)' == 'Net40Release' or '$(Configuration)' == 'Net40Debug'">
+  <ItemGroup Condition="'$(Configuration)' == 'Net35Release' or '$(Configuration)' == 'Net35Debug' or '$(Configuration)' == 'Net40Release' or '$(Configuration)' == 'Net40Debug'">
     <Reference Include="System" />
     <Reference Include="System.Core" />
   </ItemGroup>
   
-  <ItemGroup Condition="'$(Configuration)' == 'Net35Release' or '$(Configuration)' == 'Net35Debug'">
+  <ItemGroup Condition="'$(Configuration)' == 'Net20Release' or '$(Configuration)' == 'Net20Debug'">
     <Reference Include="System" />
   </ItemGroup>
 
