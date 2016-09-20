@@ -27,21 +27,6 @@ namespace NETInterceptor
             Dump((byte *)ptr.ToPointer(), length);
         }
 
-        public static unsafe byte[] ReadBlock(byte* ptr, int length)
-        {
-            var result = new byte[length];
-            int i = 0;
-            while (i < length) {
-                result[i++] = *ptr++;
-            }
-            return result;
-        }
-
-        public static unsafe byte[] ReadBlock(IntPtr ptr, int length)
-        {
-            return ReadBlock((byte*)ptr.ToPointer(), length);
-        }
-
         internal unsafe static byte* ToBytePtr(this IntPtr ptr)
         {
             return (byte*)ptr.ToPointer();
@@ -86,14 +71,6 @@ namespace NETInterceptor
             Debug.Assert(*code == 0xE9 || *code == 0xE8);
             var offset = *(int*)(code + 1);
             return code + offset + 5;
-        }
-
-        public static T[] ConcatArray<T>(T[] a1, T[] a2)
-        {
-            var result = new T[a1.Length + a2.Length];
-            a1.CopyTo(result, 0);
-            a2.CopyTo(result, a1.Length);
-            return result;
         }
 
         public unsafe static IntPtr Plus(this IntPtr ptr, int offset)

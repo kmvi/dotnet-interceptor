@@ -13,29 +13,28 @@ namespace Examples
 
         public static void Demo()
         {
-            var target = typeof(Math).GetMethod("Max",
-                BindingFlags.Static | BindingFlags.Public, null, new[] { typeof(int), typeof(int) }, null);
-            var subst = typeof(StaticMethodsExample).GetMethod("Max_Subst");
+            var target = typeof(Environment).GetMethod("GetEnvironmentVariable",
+                BindingFlags.Static | BindingFlags.Public, null, new[] { typeof(string) }, null);
+            var subst = typeof(StaticMethodsExample).GetMethod("GetEnvironmentVariable_Subst");
 
             using (_handle = Intercept.On(target, subst)) {
-                // replace Max with Min
-                var r = Math.Max(1, 2);
+                var r = Environment.GetEnvironmentVariable("test");
                 Console.WriteLine("Replaced return value: " + r);
                 Console.WriteLine();
             }
         }
 
-        public static int Max_Subst(int i1, int i2)
+        public static string GetEnvironmentVariable_Subst(string name)
         {
             Console.WriteLine("--- Static method interception --- ");
-            Console.WriteLine("--- Math.Max ---");
+            Console.WriteLine("--- Environment.GetEnvironmentVariable ---");
             Console.Write("Calling original method... ");
 
-            int result = (int)_handle.InvokeTarget(null, i1, i2);
+            var result = (string)_handle.InvokeTarget(null, name);
             Console.WriteLine("result: " + result);
 
             // replace return value
-            return Math.Min(i1, i2);
+            return "replaced value";
         }
     }
 }
