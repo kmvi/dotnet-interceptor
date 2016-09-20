@@ -73,6 +73,9 @@ namespace NETInterceptor
                 e.MoveNext();
                 len += e.Current.Length;
                 ptr = ptr.Plus(e.Current.Length);
+                if (IsRelJmp(e.Current.Opcode)) {
+                    throw new NotImplementedException();
+                }
             }
 
             return ptr;
@@ -111,6 +114,13 @@ namespace NETInterceptor
             var inst = Activator.CreateInstance(wrapper);
 
             return Marshal.SizeOf(inst);
+        }
+
+        private static bool IsRelJmp(int opcode)
+        {
+            return (opcode >= 0x70 && opcode <= 0x7F) || opcode == 0xE3 ||
+                (opcode >= 0xE8 && opcode <= 0xEB) ||
+                (opcode >= 0x0F80 && opcode <= 0x0F8F);
         }
 
         private struct SizeOfWrapper<T>
