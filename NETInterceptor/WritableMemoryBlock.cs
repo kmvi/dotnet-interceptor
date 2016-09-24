@@ -6,46 +6,50 @@ using System.Text;
 
 namespace NETInterceptor
 {
-    public class WritableMemoryBlock : IDisposable
+    public class WritableMemoryBlock : MemoryBlock, IDisposable
     {
-        private readonly IntPtr _block;
+        private readonly MemoryBlock _block;
         private readonly MEMORY_PROTECTION_CONSTANTS _oldProtect;
-        private readonly uint _size;
         private bool _disposed;
 
-        public WritableMemoryBlock(IntPtr pBlock, int size)
+        public WritableMemoryBlock(IntPtr address, int size)
+            : base(address, size)
         {
-            _block = pBlock;
-            _size = (uint)size;
+            _block = null;
 
-            var r = VirtualProtect(_block, _size, MEMORY_PROTECTION_CONSTANTS.PAGE_EXECUTE_READWRITE, out _oldProtect);
+            var result = VirtualProtect(_address, _size,
+                MEMORY_PROTECTION_CONSTANTS.PAGE_EXECUTE_READWRITE,
+                out _oldProtect);
 
-            if (!r)
+            if (!result)
                 throw new Win32Exception(Marshal.GetLastWin32Error());
         }
 
-        public static explicit operator IntPtr(WritableMemoryBlock block)
+        public WritableMemoryBlock(MemoryBlock block)
+            : this(block.Address, block.Size)
         {
-            if (block._disposed)
-                throw new ObjectDisposedException("WritableMemoryBlock");
-
-            return block._block;
+            _block = block;
         }
 
-        public void Dispose()
+        public override void Dispose()
         {
             if (!_disposed) {
                 MEMORY_PROTECTION_CONSTANTS tmp;
-                var r = VirtualProtect(_block, _size, _oldProtect, out tmp);
+                VirtualProtect(_address, _size, _oldProtect, out tmp);
+                if (_block != null)
+                    _block.Dispose();
                 _disposed = true;
             }
         }
 
         [DllImport("kernel32")]
-        public static extern unsafe bool VirtualProtect(IntPtr lpAddress, uint dwSize, MEMORY_PROTECTION_CONSTANTS flNewProtect, out MEMORY_PROTECTION_CONSTANTS lpflOldProtect);
+        private static extern unsafe bool VirtualProtect(
+            IntPtr lpAddress, int dwSize,
+            MEMORY_PROTECTION_CONSTANTS flNewProtect,
+            out MEMORY_PROTECTION_CONSTANTS lpflOldProtect);
 
         [Flags]
-        public enum MEMORY_PROTECTION_CONSTANTS
+        private enum MEMORY_PROTECTION_CONSTANTS
         {
             PAGE_EXECUTE = 0x10,
             PAGE_EXECUTE_READ = 0x20,

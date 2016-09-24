@@ -5,40 +5,31 @@ using System.Text;
 
 namespace NETInterceptor
 {
-    public class GlobalMemoryBlock : IDisposable
+    public class GlobalMemoryBlock : MemoryBlock, IDisposable
     {
-        private readonly IntPtr _address;
-        private readonly int _size;
         private bool _disposed;
 
         private GlobalMemoryBlock(IntPtr address, int size)
+            : base(address, size)
         {
-            if (address == IntPtr.Zero)
-                throw new ArgumentException("");
-
-            if (size <= 0)
-                throw new ArgumentException();
-
-            _address = address;
-            _size = size;
             _disposed = false;
         }
 
-        public IntPtr Address
+        public override IntPtr Address
         {
             get
             {
                 EnsureNotDisposed();
-                return _address;
+                return base.Address;
             }
         }
 
-        public int Size
+        public override int Size
         {
             get
             {
                 EnsureNotDisposed();
-                return _size;
+                return base.Size;
             }
         }
 
@@ -48,7 +39,7 @@ namespace NETInterceptor
                 throw new ObjectDisposedException("MemoryBlock");
         }
 
-        public void Dispose()
+        public override void Dispose()
         {
             if (!_disposed) {
                 Marshal.FreeHGlobal(_address);
