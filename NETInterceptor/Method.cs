@@ -75,7 +75,7 @@ namespace NETInterceptor
             var result = GoThroughPrecode(precode);
 
             if (result != IntPtr.Zero) {
-                Debug.Assert(result != ThePreStub.Instance.Address);
+                Debug.Assert(result != ThePreStub.Address);
                 Debug.Assert(result != FixupPrecode.PrecodeFixupThunk);
                 Debug.Assert(!Precode.HasPrecode(result));
             }
@@ -86,11 +86,11 @@ namespace NETInterceptor
         private static IntPtr GoThroughPrecode(Precode precode)
         {
             if (precode is StubPrecode || precode is RemotingPrecode) {
-                if (precode.TargetPtr == ThePreStub.Instance.Address)
+                if (precode.TargetPtr == ThePreStub.Address)
                     return IntPtr.Zero;
 
                 var addr = Utils.FollowRelJmp(precode.JmpToTargetPtr);
-                if (addr == ThePreStub.Instance.Address) {
+                if (addr == ThePreStub.Address) {
                     return IntPtr.Zero;
                 } else if (FixupPrecode.IsFixupPrecode(addr)) {
                     return GoThroughFixupPrecode(FixupPrecode.Create(addr));
@@ -108,7 +108,7 @@ namespace NETInterceptor
 
         private static IntPtr GoThroughFixupPrecode(FixupPrecode precode)
         {
-            if (precode.TargetPtr == ThePreStub.Instance.Address)
+            if (precode.TargetPtr == ThePreStub.Address)
                 return IntPtr.Zero; // method is not jitted
 
             return Utils.FollowRelJmp(precode.JmpToTargetPtr);
