@@ -19,6 +19,7 @@ namespace Examples
             StructMethodsExample.Demo();
             InstancePropertyGetterExample.Demo();
             InstancePropertySetterExample.Demo();
+            ConstructorExample.Demo();
         }
     }
 }

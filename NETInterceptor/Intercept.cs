@@ -29,7 +29,7 @@ namespace NETInterceptor
             var targetMethod = new Method(target);
             var destMethod = new Method(substitute);
 
-            var reloc = Emitter.EmitMethod((MethodInfo)target);
+            var reloc = Emitter.EmitMethod(target);
             var relocMethod = new Method(reloc);
 
             var targetAddr = targetMethod.GetCompiledCodeAddress();
@@ -44,13 +44,10 @@ namespace NETInterceptor
 
         private static void CheckSignatures(MethodBase target, MethodBase substitute)
         {
-            if (target is ConstructorInfo)
-                throw new NotSupportedException();
-
-            if (target.GetType() != substitute.GetType())
-                throw new ArgumentException("Target and its substitute should have same types.");
-
             if (target.IsStatic != substitute.IsStatic)
+                throw new ArgumentException();
+
+            if (target.DeclaringType.IsValueType != substitute.DeclaringType.IsValueType)
                 throw new ArgumentException();
 
             var targetParams = target.GetParameters();
