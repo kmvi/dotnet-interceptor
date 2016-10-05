@@ -246,27 +246,33 @@ namespace NETInterceptor
                 if (op != 0x0F) {
                     // one-byte instruction
                     switch (op) {
-                        case 0x00: case 0x01: case 0x02: case 0x03:
-                        case 0x08: case 0x09: case 0x0A: case 0x0B:
-                        case 0x10: case 0x11: case 0x12: case 0x13:
-                        case 0x18: case 0x19: case 0x1A: case 0x1B:
-                        case 0x20: case 0x21: case 0x22: case 0x23:
-                        case 0x28: case 0x29: case 0x2A: case 0x2B:
-                        case 0x30: case 0x31: case 0x32: case 0x33:
-                        case 0x38: case 0x39: case 0x3A: case 0x3B:
-                        case 0x62: case 0x63:
-                        case 0x84: case 0x85: case 0x86: case 0x87:
-                        case 0x88: case 0x89: case 0x8A: case 0x8B:
-                        case 0x8C: case 0x8D: case 0x8E: case 0x8F:
-                        case 0xC4: case 0xC5:
-                        case 0xD0: case 0xD1: case 0xD2: case 0xD3:
-                        case 0xD8: case 0xD9: case 0xDA: case 0xDB:
+                        case 0x00: case 0x01: case 0x02: case 0x03: /* add */
+                        case 0x08: case 0x09: case 0x0A: case 0x0B: /* or */
+                        case 0x10: case 0x11: case 0x12: case 0x13: /* adc */
+                        case 0x18: case 0x19: case 0x1A: case 0x1B: /* sbb */
+                        case 0x20: case 0x21: case 0x22: case 0x23: /* and */
+                        case 0x28: case 0x29: case 0x2A: case 0x2B: /* sub */
+                        case 0x30: case 0x31: case 0x32: case 0x33: /* xor */
+                        case 0x38: case 0x39: case 0x3A: case 0x3B: /* cmp */
+                        case 0x62:                                  /* bound */
+                        case 0x63:                                  /* arpl */
+                        case 0x84: case 0x85:                       /* test */
+                        case 0x86: case 0x87:                       /* xchg */
+                        case 0x88: case 0x89: case 0x8A: case 0x8B: /* mov */
+                        case 0x8C:                                  /* mov */
+                        case 0x8D:                                  /* lea */
+                        case 0x8E:                                  /* mov */
+                        case 0x8F:                                  /* pop */
+                        case 0xC4:                                  /* les */
+                        case 0xC5:                                  /* lds */
+                        case 0xD0: case 0xD1: case 0xD2: case 0xD3: /* rotate, shift */
+                        case 0xD8: case 0xD9: case 0xDA: case 0xDB: /* FPU */
                         case 0xDC: case 0xDD: case 0xDE: case 0xDF:
-                        case 0xFE: case 0xFF:
+                        case 0xFE:                                  /* inc/dec */
+                        case 0xFF:                                  /* push */
                             hasModRM = true;
                             break;
-                        case 0xF6:
-                        case 0xF7:
+                        case 0xF6: case 0xF7:                       /* test/not/neg/... */
                             hasModRM = true;
                             if ((_ptr.Current & 0x38) == 0)
                                 dataSize += (((op & 1) == 0) ? 1 : defaultDataSize);
